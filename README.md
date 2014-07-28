@@ -18,7 +18,13 @@ if it will be used by other services and front-ends.
 # Technology stack
 
 - Map visualization: Google maps (basic experience)
+- Geocoding of addresses: Google geocoding (no experience)
 - Language: Python (basic experience)
 - Framework: Flask (no experience)
 
 # Design choices
+
+- Since the focus of this application is on the backend, minimal work has been
+  put into making it compatible with older browser versions and vendors.
+- Likewise, only manual testing has been done of the frontend of the
+  application.
