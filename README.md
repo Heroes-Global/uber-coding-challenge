@@ -17,14 +17,20 @@ if it will be used by other services and front-ends.
 
 # Technology stack
 
-- Map visualization: Google maps (basic experience)
-- Geocoding of addresses: Google geocoding (no experience)
 - Language: Python (basic experience)
-- Framework: Flask (no experience)
+- Backend framework: Flask (no experience)
+- Frontend framework: None
+- Map visualization: Google maps (basic experience)
+- Database: PostgreSQL (no experience)
 
 # Design choices
 
+- I've chosen to jump into the deep end of the pool and use a range of
+  technologies that I haven't used before to write anything production ready
+  (which is also reflected in the experience listed for each technology).
 - Since the focus of this application is on the backend, minimal work has been
   put into making it compatible with older browser versions and vendors.
 - Likewise, only manual testing has been done of the frontend of the
   application.
+- The whole backend is implemented using Test-driven development.
+- Used Google geocoding service to obtain coordinates for each movie location.
