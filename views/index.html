@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 100% }
+    </style>
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBWp5uus_2-bbUI9LA4VkBZhFgj6u6OeGE"></script>
+    <script type="text/javascript">
+      // Initialize map
+      function initialize() {
+
+        var mapOptions = {
+          center : new google.maps.LatLng(37.748, -122.429),
+          zoom : 13
+        };
+        var map = new google.maps.Map(document.getElementById("map-canvas"),
+          mapOptions);
+
+        // Info window element
+        var contentString = "<placeholder text>"
+        infowindow = new google.maps.InfoWindow({
+          content : contentString
+        });
+
+        // Add pins
+        addPins(map, infowindow);
+      }
+
+      // Initialize pins
+      function addPins(map, infowindow) {
+
+        // Add dummy pin
+        var pin1Content = '<div id="content">' +
+          '<h1>A Jitney Elopement</h1>' +
+          '<p><b>A Jitney Elopement</b> (1915) was written and directed by ' +
+            'Charlie Chaplin, who also starred in the movie.</p>' +
+          '</div>';
+        var pin1 = new google.maps.Marker({
+          position : new google.maps.LatLng(37.758895, -122.4147242),
+          map : map,
+          data : pin1Content
+        });
+
+        var pin2Content = '<div id="content">' +
+          '<h1>Greed</h1>' +
+          '<p><b>Greed</b> (1924) was written and directed by ' +
+            'Eric von Stroheim, and starred Zasu Pitts and ' +
+            'Cloris Leachman.</p></div>';
+        var pin2 = new google.maps.Marker({
+          position : new google.maps.LatLng(37.7873702, -122.4234239),
+          map : map,
+          data : pin2Content
+        });
+
+        // Listen for click event
+        google.maps.event.addListener(pin1, 'click', function() {
+          infowindow.setContent(pin1.data);
+          infowindow.open(map, pin1);
+        });
+
+        google.maps.event.addListener(pin2, 'click', function() {
+          infowindow.setContent(pin2.data);
+          infowindow.open(map, pin2);
+        });
+
+      }
+
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </head>
+  <body>
+    <div id="map-canvas">
+    </div>
+  </body>
+</html>
