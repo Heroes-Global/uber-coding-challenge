@@ -33,4 +33,5 @@ if it will be used by other services and front-ends.
 - Likewise, only manual testing has been done of the frontend of the
   application.
 - The whole backend is implemented using Test-driven development.
-- Used Google geocoding service to obtain coordinates for each movie location.
+- Used the Google geocoding service to obtain coordinates for each movie
+  location.

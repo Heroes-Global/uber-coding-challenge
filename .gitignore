@@ -54,3 +54,6 @@ docs/_build/
 
 # OS/X garbage
 .DS_Store
+
+# Application config file
+config.py
