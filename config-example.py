@@ -2,7 +2,7 @@
 
 import os
 
-# Misc
+# Flask
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -18,7 +18,7 @@ SF_MOVIES_PASSWORD = "<INSERT_PASSWORD>"
 SF_MOVIES_HOST = "<INSERT_DATABASE_HOST>"
 SF_MOVIES_DATBASE = "<INSERT_DATABASE_NAME>"
 
-# Flask
+# SQLAlchemy
 
 SQLALCHEMY_DATABASE_URI = "postgresql://" + SF_MOVIES_USER + \
                           ":" + SF_MOVIES_PASSWORD + \
