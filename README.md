@@ -35,3 +35,5 @@ if it will be used by other services and front-ends.
 - The whole backend is implemented using Test-driven development.
 - Used the Google geocoding service to obtain coordinates for each movie
   location.
+- Currently doing filtering of results on the client-side, this should be moved
+  to the server for the sake of scalability.

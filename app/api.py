@@ -2,13 +2,13 @@
 
 # ## Imports
 
-from flask import url_for, jsonify, abort
+from flask import url_for, jsonify, abort, request
 from flask.ext.cors import cross_origin
 from app import app
 
 # ## Resources
 
-movies = [
+movie_list = [
   { "id" : 1,
     "release_year" : "1915",
     "title" : "A Jitney Elopement",
@@ -99,18 +99,40 @@ movies = [
 # ## Routes
 
 @app.route('/sfmovies/api/v1.0/movies', methods = ['GET'])
-@cross_origin(headers=['Content-Type']) # Send Access-Control-Allow-Headers
+@cross_origin(headers=['Content-Type'])
 def get_movies():
   """Returns a JSON representation of the locations of movies shot in San
-  Francisco.
-  """
+  Francisco."""
+
+  movies = movie_list
+
+  if request.method == 'GET':
+    title = request.args.get('title', None)
+
+    if title is not None:
+      print movies
+      movies = [movie for movie in movies if movie['title'] == title ]
+      print movies
+
   return jsonify({ 'movies' : movies })
 
 @app.route('/sfmovies/api/v1.0/movies/<int:movie_id>', methods = ['GET'])
 def get_movie(movie_id):
-  """Return a JSON representation of a movie location shot in San Francisco.
-  """
+  """Return a JSON representation of a movie location shot in San Francisco."""
+
+  movies = movie_list
+
   movie = filter(lambda m: m['id'] == movie_id, movies)
   if len(movie) == 0:
     abort(404)
   return jsonify({ 'movie' : movie[0] })
+
+@app.route('/sfmovies/api/v1.0/titles', methods = ['GET'])
+@cross_origin(headers=['Content-Type'])
+def titles():
+  """Returns a list of the titles movies shot in San Francisco."""
+
+  movies = movie_list
+
+  titles = list(set(map(lambda m: m['title'], movies)))
+  return jsonify({ 'titles' : titles })

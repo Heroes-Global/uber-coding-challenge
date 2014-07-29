@@ -1,5 +1,10 @@
 /* locations.js */
 
+// # Constants
+var BASE_URL = "http://localhost:5000/sfmovies/api/";
+
+// # Functions
+
 // Initialize front end
 var initialize = function() {
 
@@ -24,22 +29,58 @@ var initialize = function() {
         content : contentString
     });
 
-    // Initialize Bearch box
-    var input = document.getElementById('movie-input');
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-
-    // Test data
-    titles = [ 'Greed', 'A Jitney Elopement', 'The Ten Commandments',
-               'The Jazz Singer' ];
+    // Initialize Search box
+    var searchBar = document.getElementById('search-bar');
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchBar);
 
     $("#movie-input").autocomplete({
-        delay: 300,
-        appendTo: "movie-input",
-        source: titles
+        delay : 300,
+        appendTo : "#search-bar",
+        minLength: 2,
+        selectFirst: true,
+        source : function(request, response) {
+            $.getJSON(BASE_URL + "v1.0/titles", function(data) {
+                term = request.term;
+                titles = $.grep(data.titles, function(title) {
+                    return title.indexOf(term) > -1;
+                });
+                if (titles.length > 5) {
+                    titles = titles.slice(0,5);
+                }
+                response(titles);
+            });
+        },
+        select: function(event, ui) {
+
+            var ENTER_KEY = 13;
+            this.value = ui.item.value;
+
+            if (event.keyCode == ENTER_KEY) {
+                console.log("Enter pressed");
+                console.log(this.value);
+                event.preventDefault();
+                this.value = this.value + " ";
+                $('#movie-input').focus();
+            }
+
+            return false;
+        }
     });
 
-    // Add markers
-    addMarkers(map, infowindow);
+    $("#movie-input").keypress(function(event) {
+
+        if (event.keyCode == 13) {
+            title = $('.ui-menu-item').first().text();
+            $("#movie-input").val(title);
+
+            // Add markers
+            clearMarkers();
+            addMarkers(title, map, infowindow);
+
+        }
+
+    });
+
 };
 
 // Initialize markers
@@ -59,15 +100,19 @@ var addMarkerClickListener = function(map, marker) {
     });
 };
 
-var addMarkers = function(map, infowindow) {
+var addMarkers = function(title, map, infowindow) {
 
-    var BASE_URL = "http://localhost:5000/sfmovies/api/";
-    $.getJSON(BASE_URL + "v1.0/movies", function(data) {
+    $.getJSON(BASE_URL + "v1.0/movies?title=" + title, function(data) {
 
         var movies = data.movies;
         for (var i = 0; i < movies.length; i++) {
 
             movie = movies[i];
+
+            if (movie.title !== title) {
+                continue;
+            }
+
             var markerContent = '<div id="content">' +
                 '<h1>' + movie.title + '</h1>' +
                 '<p><b>' + movie.title + '</b>' +
