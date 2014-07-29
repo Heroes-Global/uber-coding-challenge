@@ -18,6 +18,8 @@ class TestCase(unittest.TestCase):
 
   # API Version 1.0 tests
 
+  ## movies
+
   def test_movies_1_0_director_should_be_charles_chaplin(self):
     jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1.0/movies"))
     assert jsonResponse['movies'][0]['director'] == "Charles Chaplin"

@@ -14,4 +14,4 @@ db = SQLAlchemy(app)
 
 from config import BASE_DIR
 
-from app import api
+from app import models, api
