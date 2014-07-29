@@ -110,9 +110,8 @@ def get_movies():
     title = request.args.get('title', None)
 
     if title is not None:
-      print movies
-      movies = [movie for movie in movies if movie['title'] == title ]
-      print movies
+      movies = [movie for movie in movies if
+                movie['title'].lower() == title.lower() ]
 
   return jsonify({ 'movies' : movies })
 

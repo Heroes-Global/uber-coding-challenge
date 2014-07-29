@@ -37,12 +37,11 @@ var initialize = function() {
         delay : 300,
         appendTo : "#search-bar",
         minLength: 2,
-        selectFirst: true,
         source : function(request, response) {
             $.getJSON(BASE_URL + "v1.0/titles", function(data) {
                 term = request.term;
                 titles = $.grep(data.titles, function(title) {
-                    return title.indexOf(term) > -1;
+                    return title.toLowerCase().indexOf(term.toLowerCase()) > -1;
                 });
                 if (titles.length > 5) {
                     titles = titles.slice(0,5);
@@ -50,33 +49,44 @@ var initialize = function() {
                 response(titles);
             });
         },
-        select: function(event, ui) {
+        /*select: function(event, ui) {
 
             var ENTER_KEY = 13;
             this.value = ui.item.value;
 
             if (event.keyCode == ENTER_KEY) {
-                console.log("Enter pressed");
-                console.log(this.value);
                 event.preventDefault();
                 this.value = this.value + " ";
                 $('#movie-input').focus();
             }
 
             return false;
-        }
+        }*/
     });
 
     $("#movie-input").keypress(function(event) {
 
         if (event.keyCode == 13) {
-            title = $('.ui-menu-item').first().text();
-            $("#movie-input").val(title);
+            var titles = [];
+            $.each($('.ui-menu-item'), function() {
+                titles.push($(this).text());
+            });
+            var input = $("#movie-input").val();
 
-            // Add markers
+            queryTitle = $('.ui-menu-item').first().text();
+
+            for (var i = 0; i < titles.length; i++) {
+                var title = titles[i];
+                if (title.toLowerCase() === input.toLowerCase()) {
+                    queryTitle = title;
+                    break;
+                }
+            }
+
+            // Set search title and add markers
+            $("#movie-input").val(queryTitle);
             clearMarkers();
-            addMarkers(title, map, infowindow);
-
+            addMarkers(queryTitle, map, infowindow);
         }
 
     });
