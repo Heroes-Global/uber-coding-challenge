@@ -24,6 +24,20 @@ var initialize = function() {
         content : contentString
     });
 
+    // Initialize Bearch box
+    var input = document.getElementById('movie-input');
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+    // Test data
+    titles = [ 'Greed', 'A Jitney Elopement', 'The Ten Commandments',
+               'The Jazz Singer' ];
+
+    $("#movie-input").autocomplete({
+        delay: 300,
+        appendTo: "movie-input",
+        source: titles
+    });
+
     // Add markers
     addMarkers(map, infowindow);
 };

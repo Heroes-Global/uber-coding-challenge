@@ -61,7 +61,7 @@ movies = [
     "release_year" : "1924",
     "title" : "Greed",
     "fun_facts" : "In 1887, the Cliff House was severely damaged when the schooner Parallel, abandoned and loaded with dynamite, ran aground on the rocks below.",
-    "writer" : "Eric von Stroheim ",
+    "writer" : "Eric von Stroheim",
     "actor_1" : "Zasu Pitts",
     "locations" : "Cliff House (1090 Point Lobos Avenue)",
     "actor_3" : "Cloris Leachman",
@@ -93,16 +93,7 @@ movies = [
     "latitude" : 37.7749295,
     "production_company" : "Warner Bros. Pictures",
     "longitude" : -122.4194155,
-    "distributor" : "Warner Bros. Pictures" },
-  { "id" : 8,
-    "release_year" : "1935",
-    "title" : "Barbary Coast",
-    "writer" : "Ben Hecht",
-    "actor_1" : "Mariam Hopkins",
-    "actor_2" : "Edward G. Robinson",
-    "director" : "Howard Hawks",
-    "production_company" : "The Samuel Goldwyn Company",
-    "distributor": "United Artists" }
+    "distributor" : "Warner Bros. Pictures" }
 ]
 
 # ## Routes
