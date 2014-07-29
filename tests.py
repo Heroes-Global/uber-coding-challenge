@@ -40,5 +40,15 @@ class TestCase(unittest.TestCase):
     jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1.0/titles"))
     assert jsonResponse['titles'][2] == "The Ten Commandments"
 
+  def test_movie_1_0_the_jazz_singer_should_have_one_results(self):
+    jsonResponse = json.load(
+      urllib2.urlopen(self.baseUrl + "v1.0/movies?title=The+Jazz+Singer"))
+    assert len(jsonResponse['movies']) == 1
+
+  def test_movie_1_0_greed_should_have_three_results(self):
+    jsonResponse = json.load(
+      urllib2.urlopen(self.baseUrl + "v1.0/movies?title=Greed"))
+    assert len(jsonResponse['movies']) == 3
+
 if __name__ == '__main__':
   unittest.main()
