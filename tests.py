@@ -3,7 +3,7 @@ import os
 import unittest
 
 from config import BASE_DIR
-from app import app
+from app import app, models
 import urllib2
 import json
 
@@ -51,6 +51,15 @@ class TestCase(unittest.TestCase):
     jsonResponse = json.load(
       urllib2.urlopen(self.baseUrl + "v1.0/movies?title=Greed"))
     assert len(jsonResponse['movies']) == 3
+
+  # Model tests
+
+  def test_model_greed_movie_location_should_have_zasu_pitts(self):
+    greed = models.MovieLocation(
+      'Greed', 1924, 'Hayes Street at Laguna', '', 'Metro-Goldwyn-Mayer (MGM)',
+      'Metro-Goldwyn-Mayer (MGM)', 'Eric von Stroheim', 'Eric von Stroheim',
+      'Zasu Pitts', '', 'Cloris Leachman', 37.7764647, -122.4262985)
+    assert greed.actor_1 == 'Zasu Pitts'
 
 if __name__ == '__main__':
   unittest.main()
