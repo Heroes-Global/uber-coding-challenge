@@ -26,7 +26,8 @@ var initialize = function() {
     var contentString = "<placeholder text>";
 
     infowindow = new google.maps.InfoWindow({
-        content : contentString
+        content : contentString,
+				maxWidth: 300,
     });
 
     // Initialize Search box
@@ -110,16 +111,29 @@ var addMarkers = function(title, map, infowindow) {
                 continue;
             }
 
-            var markerContent = '<div id="content">' +
+						// Determine marker content based on the format of the movie data.
+						var markerContent = '<div id="content">' +
                 '<h1>' + movie.title + '</h1>' +
                 '<p><b>' + movie.title + '</b>' +
-                ' (' + movie.year + ')' +
-                ' was written by ' + movie.writer +
-                ' and directed by ' + movie.director +
-                ' and starred ' + movie.actor_1 +
-                ' id: ' + movie.id +
-                '</p></div>';
+                ' (' + movie.year + ')';
 
+						if (movie.writer == movie.director) {
+								markerContent += ' was written and directed by <b>' +
+										movie.director + '</b>.';
+						} else {
+								markerContent += ' was written <b>' + movie.writer +
+										'</b> and directed by <b>' + movie.director + '</b>.';
+						}
+
+						if (movie.actor_1 !== '') {
+								markerContent += ' It starred <b>' + movie.actor_1 + '</b>';
+								if (movie.actor_2 !== '') {
+										markerContent += ' and <b>' + movie.actor_2 + '</b>';
+								}
+								markerContent += ".";
+						}
+
+						// Create marker
             var marker = new google.maps.Marker({
                 position : new google.maps.LatLng(movie.latitude,
                                                   movie.longitude),

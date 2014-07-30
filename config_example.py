@@ -1,24 +1,26 @@
 # config-example.py
 
+# # Imports
+
 import os
 
-# Flask
+# # Flask
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-# Google APIs
+# # Google APIs
 
 SERVER_KEY = "<INSERT_KEY>"
 BROWSER_KEY = "<INSERT_KEY>"
 
-# PostgreSQL
+# # PostgreSQL
 
 SF_MOVIES_USER = "<INSERT_USERNAME>"
 SF_MOVIES_PASSWORD = "<INSERT_PASSWORD>"
 SF_MOVIES_HOST = "<INSERT_DATABASE_HOST>"
 SF_MOVIES_DATBASE = "<INSERT_DATABASE_NAME>"
 
-# SQLAlchemy
+# # SQLAlchemy
 
 SQLALCHEMY_DATABASE_URI = "postgresql://" + SF_MOVIES_USER + \
                           ":" + SF_MOVIES_PASSWORD + \

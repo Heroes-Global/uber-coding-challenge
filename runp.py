@@ -1,3 +1,9 @@
 #!/usr/bin/env python
+
+# # Imports
+
 from app import app
-app.run(debug = False)
+
+# # Script
+
+app.run(debug=False)
