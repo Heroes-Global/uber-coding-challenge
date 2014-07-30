@@ -26,6 +26,7 @@ def main():
   movies = json.load(fileIn)
   fileIn.close()
 
+  print "Parsing Movie objects"
   for movie in movies:
 
 	# filter movies lacking minimum requirements for being interesting
@@ -35,22 +36,23 @@ def main():
 	  continue
 
 	# Extract fields
-	location = movie['locations']
-	title = movie['title']
-	year = int(movie['release_year'])
+	location = movie['locations'].strip()
+	title = movie['title'].strip()
+	year = int(movie['release_year'].strip())
 	latitude = movie['latitude']
 	longitude = movie['longitude']
 
-	fun_fact = movie['fun_facts'] if 'fun_facts' in movie else ""
-	production_company = movie['production_company'] \
+	fun_fact = movie['fun_facts'].strip() if 'fun_facts' in movie else ""
+	production_company = movie['production_company'].strip() \
 						 if 'production_company' in movie else ""
-	distributor = movie['distributor'] if 'distributor' in movie else ""
-	director = movie['director'] if 'director' in movie else ""
-	writer = movie['writer'] if 'writer' in movie else ""
-	actor_1 = movie['actor_1'] if 'actor_1' in movie else ""
-	actor_2 = movie['actor_2'] if 'actor_2' in movie else ""
-	actor_3 = movie['actor_3'] if 'actor_3' in movie else ""
+	distributor = movie['distributor'].strip() if 'distributor' in movie else ""
+	director = movie['director'].strip() if 'director' in movie else ""
+	writer = movie['writer'].strip() if 'writer' in movie else ""
+	actor_1 = movie['actor_1'].strip() if 'actor_1' in movie else ""
+	actor_2 = movie['actor_2'].strip() if 'actor_2' in movie else ""
+	actor_3 = movie['actor_3'].strip() if 'actor_3' in movie else ""
 
+	# Create model object
 	movieObj = models.MovieLocation(title = title,
 									year = year,
 									location = location,
@@ -65,7 +67,12 @@ def main():
 									latitude = latitude,
 									longitude = longitude)
 
-	print unicode(''+repr(movieObj), 'utf-8')
+	# Add to transaction
+	db.session.add(movieObj)
+
+  # Commit transaction
+  db.session.commit()
+  print "Script finished successfully"
 
 # ## Run script
 

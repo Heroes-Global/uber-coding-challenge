@@ -20,7 +20,7 @@ class MovieLocation(db.Model):
   writer = db.Column(db.String(80), index = True)
   actor_1 = db.Column(db.String(80), index = True)
   actor_2 = db.Column(db.String(80), index = True)
-  actor_3 = db.Column(db.String(80))
+  actor_3 = db.Column(db.String(80), index = True)
   latitude = db.Column(db.Float())
   longitude = db.Column(db.Float())
 
