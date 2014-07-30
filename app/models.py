@@ -34,8 +34,8 @@ class MovieLocation(db.Model):
     # ## Methods
 
     def __repr__(self):
-        return '<MovieLocation: {} ({}),'.format(self.title, self.year) +
-        ' written by {}'.format(self.writer) +
-        ' and directed by {}.'.format(self.director) +
-        ' Location: {}>'.format(unicodedata.normalize(
-            'NFKD', self.location).encode('ascii', 'ignore'))
+        return '<MovieLocation: {} ({}),'.format(self.title, self.year) + \
+            ' written by {}'.format(self.writer) + \
+            ' and directed by {}.'.format(self.director) + \
+            ' Location: {}>'.format(unicodedata.normalize(
+                'NFKD', self.location).encode('ascii', 'ignore'))
