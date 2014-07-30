@@ -1,5 +1,7 @@
 /* style.css */
 
+/* General */
+
 html {
     height: 100%
 }
@@ -10,9 +12,13 @@ body {
     padding: 0px
 }
 
+/* Map */
+
 #map-canvas {
     height: 100%
 }
+
+/* Search bar */
 
 .controls {
     margin-top: 16px;
@@ -38,13 +44,11 @@ body {
 #movie-input:focus {
     border-color: #4d90fe;
     margin-left: -1px;
-    padding-left: 14px;  /* Regular padding-left + 1. */
+    padding-left: 14px; /* Regular padding-left + 1. */
     width: 401px;
 }
 
-.movie-container {
-    font-family: Roboto;
-}
+/* Search result suggestions */
 
 #search-bar ul {
     list-style:none;
@@ -52,25 +56,13 @@ body {
     padding-left:0px;
 }
 
-.ui-menu-item {
+li.ui-menu-item {
     border: 1px solid transparent;
     border-radius: 2px 0 0 2px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     background-color: #fff;
-    height: 32px;
+    height: 18px;
     outline: none;
-}
-
-#type-selector {
-    color: #fff;
-    background-color: #4d90fe;
-    padding: 5px 11px 0px 11px;
-}
-
-#type-selector label {
-    font-family: Roboto;
-    font-size: 13px;
-    font-weight: 300;
 }

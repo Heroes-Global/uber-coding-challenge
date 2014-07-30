@@ -1,14 +1,36 @@
 /* locations.js */
 
 // # Constants
+
 var BASE_URL = "http://localhost:5000/sfmovies/api/";
 
 // # Functions
 
-// Initialize front end
+/**
+ * Initializes the front end of the application.
+ */
 var initialize = function() {
 
-    // Initialize map
+		// Initialize map
+		var map = initializeMap();
+
+    // Initialize info window
+    var infowindow = new google.maps.InfoWindow({
+        content : "<placeholder text>",
+				maxWidth: 300,
+    });
+
+    // Initialize Search box
+		initializeSearchBar(map, infowindow);
+};
+
+/**
+ * Initializes map.
+ *
+ * @return {Map} An initialized Google maps object.
+ */
+var initializeMap = function () {
+
     var MAP_CANVAS = "map-canvas";
     var SF_LATITUDE = 37.748;
     var SF_LONGITUDE = -122.429;
@@ -19,51 +41,69 @@ var initialize = function() {
         zoom : DEFAULT_ZOOM
     };
 
-    var map = new google.maps.Map(document.getElementById(MAP_CANVAS),
-                                  mapOptions);
+    return new google.maps.Map(document.getElementById(MAP_CANVAS),
+                               mapOptions);
+};
 
-    // Initialize Info window
-    var contentString = "<placeholder text>";
+/**
+ * Initializes the search bar.
+ *
+ * @param {Map} map The Google maps object.
+ * @param {InfoWindow} infowindow The {InfoWindow} used for showing the
+ * information of a {Marker}.
+ */
+var initializeSearchBar = function (map, infowindow) {
 
-    infowindow = new google.maps.InfoWindow({
-        content : contentString,
-				maxWidth: 300,
-    });
+		var SEARCH_BAR = "search-bar";
+		var MOVIE_INPUT = "movie-input";
+		var UI_MENU_ITEM = "ui-menu-item";
 
-    // Initialize Search box
-    var searchBar = document.getElementById('search-bar');
+    var searchBar = document.getElementById(SEARCH_BAR);
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchBar);
 
-    $("#movie-input").autocomplete({
+		// Auto complete
+
+    $("#" + MOVIE_INPUT).autocomplete({
         delay : 300,
-        appendTo : "#search-bar",
         minLength: 2,
-        source : function(request, response) {
-            $.getJSON(BASE_URL + "v1.0/titles", function(data) {
-                term = request.term;
-                titles = $.grep(data.titles, function(title) {
+        appendTo : "#" + SEARCH_BAR,
+        source : function (request, response) {
+
+						// Get movie titles and show most relevant
+            $.getJSON(BASE_URL + "v1.0/titles", function (data) {
+
+                var term = request.term;
+                var titles = $.grep(data.titles, function (title) {
                     return title.toLowerCase().indexOf(term.toLowerCase()) > -1;
                 });
+
                 if (titles.length > 5) {
                     titles = titles.slice(0,5);
                 }
+
                 response(titles);
             });
         },
     });
 
-    $("#movie-input").keypress(function(event) {
+		// Keypress (enter)
 
-        if (event.keyCode == 13) {
+    $("#" + MOVIE_INPUT).keypress(function (event) {
+
+				var ENTER_KEY = 13;
+        if (event.keyCode === ENTER_KEY) {
+
+						// Extract suggestions
             var titles = [];
-            $.each($('.ui-menu-item'), function() {
+            $.each($('.' + UI_MENU_ITEM), function() {
                 titles.push($(this).text());
             });
-            var input = $("#movie-input").val();
 
-            queryTitle = $('.ui-menu-item').first().text();
-
+						// Compare input with suggestions
+            var input = $("#" + MOVIE_INPUT).val();
+            var queryTitle = $("." + UI_MENU_ITEM).first().text();
             for (var i = 0; i < titles.length; i++) {
+
                 var title = titles[i];
                 if (title.toLowerCase() === input.toLowerCase()) {
                     queryTitle = title;
@@ -72,18 +112,19 @@ var initialize = function() {
             }
 
             // Set search title and add markers
-            $("#movie-input").val(queryTitle);
+            $("#" + MOVIE_INPUT).val(queryTitle);
             clearMarkers();
             addMarkers(queryTitle, map, infowindow);
         }
-
     });
-
 };
 
-// Initialize markers
+// Initializes the markers.
 var markers = [];
 
+/**
+ * Clear all markers on the map.
+ */
 var clearMarkers = function() {
     for (var i = 0; i < markers.length; i++) {
         markers[i].setMap(null);
@@ -91,47 +132,46 @@ var clearMarkers = function() {
     markers.length = 0;
 };
 
-var addMarkerClickListener = function(map, marker) {
+/**
+ * Listens for click events on the specified marker and shows its content when
+ * clicked.
+ *
+ * @param {Map} map The Google maps object.
+ * @param {Marker} marker The {Marker} to have the listener added.
+ * @param {InfoWindow} infowindow The {InfoWindow} used for showing the
+ * information of a {Marker}.
+ */
+var addMarkerClickListener = function(map, marker, infowindow) {
     google.maps.event.addListener(marker, 'click', function() {
         infowindow.setContent(marker.data);
         infowindow.open(map, marker);
     });
 };
 
+/**
+ * Add all markers corresponding to movie locations for which the movie has the
+ * specified title.
+ *
+ * @param {string} title The title of the movie.
+ * @param {Map} map The Google maps object.
+ * @param {InfoWindow} infowindow The {InfoWindow} used for showing the
+ * information of a {Marker}.
+ */
 var addMarkers = function(title, map, infowindow) {
 
+		// Get movie titles
     $.getJSON(BASE_URL + "v1.0/movies?title=" + title, function(data) {
 
         var movies = data.movies;
         for (var i = 0; i < movies.length; i++) {
 
-            movie = movies[i];
-
+            var movie = movies[i];
             if (movie.title !== title) {
                 continue;
             }
 
-						// Determine marker content based on the format of the movie data.
-						var markerContent = '<div id="content">' +
-                '<h1>' + movie.title + '</h1>' +
-                '<p><b>' + movie.title + '</b>' +
-                ' (' + movie.year + ')';
-
-						if (movie.writer == movie.director) {
-								markerContent += ' was written and directed by <b>' +
-										movie.director + '</b>.';
-						} else {
-								markerContent += ' was written <b>' + movie.writer +
-										'</b> and directed by <b>' + movie.director + '</b>.';
-						}
-
-						if (movie.actor_1 !== '') {
-								markerContent += ' It starred <b>' + movie.actor_1 + '</b>';
-								if (movie.actor_2 !== '') {
-										markerContent += ' and <b>' + movie.actor_2 + '</b>';
-								}
-								markerContent += ".";
-						}
+						// Determine marker content based on the format of the movie data
+						var markerContent = buildMarkerContentString(movie);
 
 						// Create marker
             var marker = new google.maps.Marker({
@@ -141,10 +181,51 @@ var addMarkers = function(title, map, infowindow) {
                 data : markerContent
             });
 
+						// Register marker and add click listene
             markers.push(marker);
-            addMarkerClickListener(map, marker);
+            addMarkerClickListener(map, marker, infowindow);
         }
     });
 };
 
+/**
+ * Build content string for the movie location object.
+ *
+ * @param {Movie} movie The movie object from which to extract a content
+ * string.
+ * @return {string} the content string of the specified {Movie}.
+ */
+var buildMarkerContentString = function (movie) {
+
+		var markerContent = '<div id="content">' +
+        '<h1>' + movie.title + '</h1>' +
+        '<p><b>' + movie.title + '</b>' +
+        ' (' + movie.year + ')';
+
+		if (movie.writer === movie.director) {
+				markerContent += ' was written and directed by <b>' +
+						movie.director + '</b>.';
+		} else {
+				markerContent += ' was written <b>' + movie.writer +
+						'</b> and directed by <b>' + movie.director + '</b>.';
+		}
+
+		if (movie.actor_1 !== '') {
+				markerContent += ' It starred <b>' + movie.actor_1 + '</b>';
+				if (movie.actor_2 !== '') {
+						markerContent += ' and <b>' + movie.actor_2 + '</b>';
+				}
+				markerContent += ".";
+		}
+
+		markerContent += '<br/><br/><b>Location:</b> ' + movie.location;
+
+		if (movie.fun_fact !== '') {
+				markerContent += '<br/><b>Fun fact:</b> ' + movie.fun_fact;
+		}
+
+		return markerContent;
+};
+
+// Run initialize function
 google.maps.event.addDomListener(window, 'load', initialize);
