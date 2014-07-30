@@ -32,15 +32,15 @@ class TestCase(unittest.TestCase):
     jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1.0/movies"))
     assert jsonResponse['movies'][6]['writer'] == "Alfred A. Cohn"
 
-  def test_movies_1_0_movie_should_have_release_year_1923(self):
+  def test_movies_1_0_movie_should_have_year_1923(self):
     movieID = 3
     jsonResponse = json.load(urllib2.urlopen(self.baseUrl + \
                                              "v1.0/movies/" + str(movieID)))
-    assert jsonResponse['movie']['release_year'] == "1923"
+    assert jsonResponse['movie']['year'] == 1923
 
   def test_movies_1_0_title_should_be_ten_commandments(self):
     jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1.0/titles"))
-    assert jsonResponse['titles'][2] == "The Ten Commandments"
+    assert jsonResponse['titles'][2] == "Play it Again, Sam"
 
   def test_movie_1_0_the_jazz_singer_should_have_one_results(self):
     jsonResponse = json.load(
@@ -55,10 +55,19 @@ class TestCase(unittest.TestCase):
   # Model tests
 
   def test_model_greed_movie_location_should_have_zasu_pitts(self):
-    greed = models.MovieLocation(
-      'Greed', 1924, 'Hayes Street at Laguna', '', 'Metro-Goldwyn-Mayer (MGM)',
-      'Metro-Goldwyn-Mayer (MGM)', 'Eric von Stroheim', 'Eric von Stroheim',
-      'Zasu Pitts', '', 'Cloris Leachman', 37.7764647, -122.4262985)
+    greed = models.MovieLocation(title = 'Greed',
+								 year = 1924,
+								 location = 'Hayes Street at Laguna',
+								 fun_fact = '',
+								 production_company = 'Metro-Goldwyn-Mayer (MGM)',
+								 distributor = 'Metro-Goldwyn-Mayer (MGM)',
+								 director = 'Eric von Stroheim',
+								 writer = 'Eric von Stroheim',
+								 actor_1 = 'Zasu Pitts',
+								 actor_2 = '',
+								 actor_3 = 'Cloris Leachman',
+								 latitude = 37.7764647,
+								 longitude = -122.4262985)
     assert greed.actor_1 == 'Zasu Pitts'
 
 if __name__ == '__main__':

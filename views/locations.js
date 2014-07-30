@@ -49,19 +49,6 @@ var initialize = function() {
                 response(titles);
             });
         },
-        /*select: function(event, ui) {
-
-            var ENTER_KEY = 13;
-            this.value = ui.item.value;
-
-            if (event.keyCode == ENTER_KEY) {
-                event.preventDefault();
-                this.value = this.value + " ";
-                $('#movie-input').focus();
-            }
-
-            return false;
-        }*/
     });
 
     $("#movie-input").keypress(function(event) {
@@ -126,7 +113,7 @@ var addMarkers = function(title, map, infowindow) {
             var markerContent = '<div id="content">' +
                 '<h1>' + movie.title + '</h1>' +
                 '<p><b>' + movie.title + '</b>' +
-                ' (' + movie.release_year + ')' +
+                ' (' + movie.year + ')' +
                 ' was written by ' + movie.writer +
                 ' and directed by ' + movie.director +
                 ' and starred ' + movie.actor_1 +
