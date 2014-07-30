@@ -46,6 +46,7 @@ if it will be used by other services and front-ends.
 - (Something about filtering on the client vs server side).
 - Used the Google Maps API 3 to show the map and add the markers for every movie
   location.
+- JavaScript code checked with the JSHint tool.
 
 ## Back-end
 
@@ -53,6 +54,7 @@ if it will be used by other services and front-ends.
   way.
 - Used the Google geocoding service to obtain coordinates for each movie
   location.
+- Python code adheres to the PEP8 Style guide.
 
 ### API
 

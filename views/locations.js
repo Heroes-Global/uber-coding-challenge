@@ -9,19 +9,19 @@ var BASE_URL = "http://localhost:5000/sfmovies/api/";
 /**
  * Initializes the front end of the application.
  */
-var initialize = function() {
+var initialize = function () {
 
-		// Initialize map
-		var map = initializeMap();
+    // Initialize map
+    var map = initializeMap();
 
     // Initialize info window
     var infowindow = new google.maps.InfoWindow({
         content : "<placeholder text>",
-				maxWidth: 300,
+        maxWidth: 300,
     });
 
     // Initialize Search box
-		initializeSearchBar(map, infowindow);
+    initializeSearchBar(map, infowindow);
 };
 
 /**
@@ -54,14 +54,14 @@ var initializeMap = function () {
  */
 var initializeSearchBar = function (map, infowindow) {
 
-		var SEARCH_BAR = "search-bar";
-		var MOVIE_INPUT = "movie-input";
-		var UI_MENU_ITEM = "ui-menu-item";
+    var SEARCH_BAR = "search-bar";
+    var MOVIE_INPUT = "movie-input";
+    var UI_MENU_ITEM = "ui-menu-item";
 
     var searchBar = document.getElementById(SEARCH_BAR);
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchBar);
 
-		// Auto complete
+    // Auto complete
 
     $("#" + MOVIE_INPUT).autocomplete({
         delay : 300,
@@ -69,7 +69,7 @@ var initializeSearchBar = function (map, infowindow) {
         appendTo : "#" + SEARCH_BAR,
         source : function (request, response) {
 
-						// Get movie titles and show most relevant
+            // Get movie titles and show most relevant
             $.getJSON(BASE_URL + "v1.0/titles", function (data) {
 
                 var term = request.term;
@@ -86,20 +86,20 @@ var initializeSearchBar = function (map, infowindow) {
         },
     });
 
-		// Keypress (enter)
+    // Keypress (enter)
 
     $("#" + MOVIE_INPUT).keypress(function (event) {
 
-				var ENTER_KEY = 13;
+        var ENTER_KEY = 13;
         if (event.keyCode === ENTER_KEY) {
 
-						// Extract suggestions
+            // Extract suggestions
             var titles = [];
             $.each($('.' + UI_MENU_ITEM), function() {
                 titles.push($(this).text());
             });
 
-						// Compare input with suggestions
+            // Compare input with suggestions
             var input = $("#" + MOVIE_INPUT).val();
             var queryTitle = $("." + UI_MENU_ITEM).first().text();
             for (var i = 0; i < titles.length; i++) {
@@ -159,7 +159,7 @@ var addMarkerClickListener = function(map, marker, infowindow) {
  */
 var addMarkers = function(title, map, infowindow) {
 
-		// Get movie titles
+    // Get movie titles
     $.getJSON(BASE_URL + "v1.0/movies?title=" + title, function(data) {
 
         var movies = data.movies;
@@ -170,10 +170,10 @@ var addMarkers = function(title, map, infowindow) {
                 continue;
             }
 
-						// Determine marker content based on the format of the movie data
-						var markerContent = buildMarkerContentString(movie);
+            // Determine marker content based on the format of the movie data
+            var markerContent = buildMarkerContentString(movie);
 
-						// Create marker
+            // Create marker
             var marker = new google.maps.Marker({
                 position : new google.maps.LatLng(movie.latitude,
                                                   movie.longitude),
@@ -181,7 +181,7 @@ var addMarkers = function(title, map, infowindow) {
                 data : markerContent
             });
 
-						// Register marker and add click listene
+            // Register marker and add click listene
             markers.push(marker);
             addMarkerClickListener(map, marker, infowindow);
         }
@@ -197,34 +197,34 @@ var addMarkers = function(title, map, infowindow) {
  */
 var buildMarkerContentString = function (movie) {
 
-		var markerContent = '<div id="content">' +
+    var markerContent = '<div id="content">' +
         '<h1>' + movie.title + '</h1>' +
         '<p><b>' + movie.title + '</b>' +
         ' (' + movie.year + ')';
 
-		if (movie.writer === movie.director) {
-				markerContent += ' was written and directed by <b>' +
-						movie.director + '</b>.';
-		} else {
-				markerContent += ' was written <b>' + movie.writer +
-						'</b> and directed by <b>' + movie.director + '</b>.';
-		}
+    if (movie.writer === movie.director) {
+        markerContent += ' was written and directed by <b>' +
+            movie.director + '</b>.';
+    } else {
+        markerContent += ' was written <b>' + movie.writer +
+            '</b> and directed by <b>' + movie.director + '</b>.';
+    }
 
-		if (movie.actor_1 !== '') {
-				markerContent += ' It starred <b>' + movie.actor_1 + '</b>';
-				if (movie.actor_2 !== '') {
-						markerContent += ' and <b>' + movie.actor_2 + '</b>';
-				}
-				markerContent += ".";
-		}
+    if (movie.actor_1 !== '') {
+        markerContent += ' It starred <b>' + movie.actor_1 + '</b>';
+        if (movie.actor_2 !== '') {
+            markerContent += ' and <b>' + movie.actor_2 + '</b>';
+        }
+        markerContent += ".";
+    }
 
-		markerContent += '<br/><br/><b>Location:</b> ' + movie.location;
+    markerContent += '<br/><br/><b>Location:</b> ' + movie.location;
 
-		if (movie.fun_fact !== '') {
-				markerContent += '<br/><b>Fun fact:</b> ' + movie.fun_fact;
-		}
+    if (movie.fun_fact !== '') {
+        markerContent += '<br/><b>Fun fact:</b> ' + movie.fun_fact;
+    }
 
-		return markerContent;
+    return markerContent;
 };
 
 // Run initialize function
