@@ -54,7 +54,7 @@ def titles():
 def jsonify_movie_location(movie_location):
   """Takes a MovieLocation object and returns its JSON representation."""
 
-  json_movie_location = {
+  return {
 	'id' : movie_location.id,
 	'title' : movie_location.title,
 	'year' : movie_location.year,
@@ -70,5 +70,3 @@ def jsonify_movie_location(movie_location):
 	'latitude' : movie_location.latitude,
 	'longitude' : movie_location.longitude
   }
-
-  return json_movie_location
