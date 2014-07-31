@@ -66,12 +66,23 @@ def get_movies():
 
     """
 
-    movies = models.MovieLocation.query.all()
+    movies = models.MovieLocation.query.order_by('id').all()
     movies = map(lambda movie: jsonify_movie_location(movie), movies)
 
     if request.method == 'GET':
         title = request.args.get('title', None)
         year = request.args.get('year', None)
+        location = request.args.get('location', None)
+        # fun_fact = request.args.get('fun_fact', None)
+        production_company = request.args.get('production_company', None)
+        distributor = request.args.get('distributor', None)
+        director = request.args.get('director', None)
+        writer = request.args.get('writer', None)
+        actor_1 = request.args.get('actor_1', None)
+        actor_2 = request.args.get('actor_2', None)
+        actor_3 = request.args.get('actor_3', None)
+        # latitude = request.args.get('latitude', None)
+        # longitude = request.args.get('longitude', None)
 
     if title is not None:
         movies = [movie for movie in movies if
@@ -131,7 +142,7 @@ def jsonify_movie_location(movie_location):
         'writer': movie_location.writer,
         'actor_1': movie_location.actor_1,
         'actor_2': movie_location.actor_2,
-        'actor_1': movie_location.actor_1,
+        'actor_3': movie_location.actor_3,
         'latitude': movie_location.latitude,
         'longitude': movie_location.longitude,
         'links': [
