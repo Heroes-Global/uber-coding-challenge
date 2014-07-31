@@ -157,9 +157,9 @@ class TestCase(unittest.TestCase):
         assert jsonResponse['movies'][4]['location'] == "Marina Green " + \
             "(Marina District)"
 
-    # Get /movies?year
+    # GET /movies?year
 
-    # /movies?title&year
+    # GET /movies?title&year
 
     def test_movies_v1_vertigo_1958_should_have_length_16(self):
         jsonResponse = json.load(urllib2.urlopen(
@@ -170,6 +170,14 @@ class TestCase(unittest.TestCase):
         jsonResponse = json.load(urllib2.urlopen(
             self.baseUrl + "v1/movies?title=Vertigo&year=1959"))
         assert len(jsonResponse['movies']) == 0
+
+    # GET /movies?sort
+
+    # GET /movies?director&sort
+
+    # GET /movies?fields
+
+    # GET /movies?year&fields&sort
 
     # ### Model tests
 

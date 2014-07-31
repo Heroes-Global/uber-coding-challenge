@@ -66,31 +66,63 @@ def get_movies():
 
     """
 
-    movies = models.MovieLocation.query.order_by('id').all()
-    movies = map(lambda movie: jsonify_movie_location(movie), movies)
+    query = models.MovieLocation.query
+    parameters = {}
 
+    # Get parameters
     if request.method == 'GET':
-        title = request.args.get('title', None)
-        year = request.args.get('year', None)
-        location = request.args.get('location', None)
-        # fun_fact = request.args.get('fun_fact', None)
-        production_company = request.args.get('production_company', None)
-        distributor = request.args.get('distributor', None)
-        director = request.args.get('director', None)
-        writer = request.args.get('writer', None)
-        actor_1 = request.args.get('actor_1', None)
-        actor_2 = request.args.get('actor_2', None)
-        actor_3 = request.args.get('actor_3', None)
-        # latitude = request.args.get('latitude', None)
-        # longitude = request.args.get('longitude', None)
+        arguments = request.args.items()
+        for arg in arguments:
+            parameters[arg[0]] = arg[1]
 
-    if title is not None:
-        movies = [movie for movie in movies if
-                  movie['title'].lower() == title.lower()]
+    # filter
+    for parameter in parameters:
+        parameterValue = parameters[parameter]
+        modelValue = getattr(models.MovieLocation, parameter, None)
+        if modelValue is not None:
+            query = query.filter(modelValue == parameterValue)
 
-    if year is not None:
-        movies = [movie for movie in movies if
-                  movie['year'] == int(year)]
+    # sort
+    if 'sort' in parameters:
+        sort_field = parameters['sort']
+        order = sort_field[0]
+        if order == '-':
+            sort_field = sort_field[1:]
+            model_field = getattr(models.MovieLocation, sort_field, None)
+            if model_field is not None:
+                query = query.order_by(model_field.desc())
+        elif order == '+':
+            sort_field = sort_field[1:]
+            model_field = getattr(models.MovieLocation, sort_field, None)
+            if model_field is not None:
+                query = query.order_by(model_field)
+        else:
+            model_field = getattr(models.MovieLocation, sort_field, None)
+            if model_field is not None:
+                query = query.order_by(model_field)
+    else:
+        query = query.order_by('id')
+
+    # select
+    if 'fields' in parameters:
+        fields = parameters['fields'].split(",")
+        for field in fields:
+            model_field = getattr(models.MovieLocation, field, None)
+            if model_field is not None:
+                query = query.add_column(model_field)
+        query = query.add_column(models.MovieLocation.id)
+
+    # pagin
+    if 'limit' in parameters:
+        query = query.limit(parameters['limit'])
+    else:
+        query = query.limit(20)  # Default limit
+
+    if 'offset' in parameters:
+        query = query.offset(parameters['offset'])
+
+    movies = query.all()
+    movies = map(lambda movie: jsonify_movie_location(movie), movies)
 
     return jsonify({'movies': movies})
 
@@ -129,24 +161,22 @@ def jsonify_movie_location(movie_location):
     """Takes a MovieLocation object and returns its JSON representation.
 
     """
+    fields = ['id', 'title', 'year', 'location', 'fun_fact',
+              'production_company', 'distributor', 'director', 'writer',
+              'actor_1', 'actor_2', 'actor_3', 'latitude', 'longitude',
+              'links']
 
-    return {
-        'id': movie_location.id,
-        'title': movie_location.title,
-        'year': movie_location.year,
-        'location': movie_location.location,
-        'fun_fact': movie_location.fun_fact,
-        'production_company': movie_location.production_company,
-        'distributor': movie_location.distributor,
-        'director': movie_location.director,
-        'writer': movie_location.writer,
-        'actor_1': movie_location.actor_1,
-        'actor_2': movie_location.actor_2,
-        'actor_3': movie_location.actor_3,
-        'latitude': movie_location.latitude,
-        'longitude': movie_location.longitude,
-        'links': [
+    json_movie = {}
+
+    for field in fields:
+        fieldValue = getattr(movie_location, field, None)
+        if fieldValue is not None:
+            json_movie[field] = fieldValue
+
+    if 'links' in fields:
+        json_movie['links'] = [
             {'rel': 'self',
              'href': '/api/v1/movies/' + str(movie_location.id)}
         ]
-    }
+
+    return json_movie
