@@ -83,7 +83,7 @@ class TestCase(unittest.TestCase):
 
     # ### Model tests
 
-    def test_model_greed_movie_location_should_have_zasu_pitts(self):
+    def test_model_greed_should_have_actor_zasu_pitts(self):
         greed = models.MovieLocation(
             title='Greed',
             year=1924,
@@ -99,6 +99,23 @@ class TestCase(unittest.TestCase):
             latitude=37.7764647,
             longitude=-122.4262985)
         assert greed.actor_1 == 'Zasu Pitts'
+
+    def test_model_vertigo_should_have_year_director_alfred_hitchcock(self):
+        vertigo = models.MovieLocation(
+            title="Vertigo",
+            year=1958,
+            location="San Francisco Drydock (20th and Illinois Streets)",
+            fun_fact="",
+            production_company="Alfred J. Hitchcock Productions",
+            distributor="Paramount Pictures",
+            director="Alfred Hitchcock",
+            writer="Alec Coppel",
+            actor_1="James Stewart",
+            actor_2="Kim Novak",
+            latitude=37.7561141,
+            longitude=-122.3871395)
+        assert vertigo.director == 'Alfred Hitchcock'
+
 
 if __name__ == '__main__':
     unittest.main()

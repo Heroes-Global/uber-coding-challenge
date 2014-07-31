@@ -54,6 +54,8 @@ level of functionality and interaction to reflect the project solution.
 
 ## Back-end
 
+- Flask: minimal framework for backend Python.
+
 - Implemented the back-end as a REST service:
   - Client-server: A uniform interface separates clients from the servers, i.e.,
     the API provided by the server.
@@ -67,17 +69,14 @@ level of functionality and interaction to reflect the project solution.
   - Uniform interface: All resources are accessed via the URI:
     `/sfmovies/api/v1.0/movies/` and all results are represented using JSON.
 
-- Implemented in a test-driven fashion, but not done in the completely rigorous
-  way.
+- The back-end is very restrictive as it only allows GET requests as there is no
+  authentication mechanism to allow POST, PUT and DELETE to happen in a
+  responsible manner.
+
+- Implemented in a test-driven fashion, but not in the completely rigorous way.
 - Used the Google geocoding service to obtain coordinates for each movie
   location.
 - Python code adheres to the PEP8 Style guide.
-
-### API
-
-- Flask: minimal framework for backend Python.
-
-### Database
 
 - PostgreSQL: A basic structure where one movie location record is translated
   into one row in a table.

@@ -38,7 +38,9 @@ def cache_response(response):
     - `response`:
     """
 
-    if not request.values:
+    STATUS_OK = 200
+
+    if not request.values and response.status_code == STATUS_OK:
         cache.set(request.path, response, SERVER_CACHE_TIMEOUT)
     return response
 
