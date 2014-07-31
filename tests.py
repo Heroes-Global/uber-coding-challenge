@@ -62,12 +62,24 @@ class TestCase(unittest.TestCase):
             self.baseUrl + "v1.0/movies?title=Greed"))
         assert len(jsonResponse['movies']) == 3
 
+    # /movies?title&year
+
+    def test_movie_1_0_vertigo_1958_should_have_length_16(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1.0/movies?title=Vertigo&year=1958"))
+        assert len(jsonResponse['movies']) == 16
+
+    def test_movie_1_0_vertigo_1959_should_have_length_0(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1.0/movies?title=Vertigo&year=1959"))
+        assert len(jsonResponse['movies']) == 0
+
     # /titles
 
-    def test_movies_1_0_title_should_be_ten_commandments(self):
+    def test_movies_1_0_fourth_title_should_be_the_matrix(self):
         jsonResponse = json.load(urllib2.urlopen(
             self.baseUrl + "v1.0/titles"))
-        assert jsonResponse['titles'][2] == "Play it Again, Sam"
+        assert jsonResponse['titles'][3] == "The Matrix"
 
     # ### Model tests
 

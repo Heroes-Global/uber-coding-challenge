@@ -7,6 +7,51 @@ from flask.ext.cors import cross_origin
 from app import app
 from app import models
 from app import db
+from werkzeug.contrib.cache import SimpleCache  # production: MemcachedCache
+
+# ## Caching
+
+
+cache = SimpleCache()  # production: cache = MemcachedCache([''])
+
+CLIENT_CACHE_TIMEOUT = 300
+SERVER_CACHE_TIMEOUT = 300
+
+
+@app.before_request
+def return_cached():
+    """Checks if request is already cached.
+
+    """
+
+    if not request.values:
+        response = cache.get(request.path)
+        if response:
+            return response
+
+
+@app.after_request
+def cache_response(response):
+    """Caches a response.
+
+    Arguments:
+    - `response`:
+    """
+
+    if not request.values:
+        cache.set(request.path, response, SERVER_CACHE_TIMEOUT)
+    return response
+
+
+@app.after_request
+def add_header(response):
+    """
+
+    Arguments:
+    - `response`:
+    """
+    response.cache_control.max_age = CLIENT_CACHE_TIMEOUT
+    return response
 
 # ## Resources
 
@@ -24,10 +69,15 @@ def get_movies():
 
     if request.method == 'GET':
         title = request.args.get('title', None)
+        year = request.args.get('year', None)
 
     if title is not None:
         movies = [movie for movie in movies if
                   movie['title'].lower() == title.lower()]
+
+    if year is not None:
+        movies = [movie for movie in movies if
+                  movie['year'] == int(year)]
 
     return jsonify({'movies': movies})
 
@@ -38,13 +88,12 @@ def get_movie(movie_id):
 
     """
 
-    movies = models.MovieLocation.query.all()
-    movies = map(lambda movie: jsonify_movie_location(movie), movies)
-
-    movie = filter(lambda m: m['id'] == movie_id, movies)
-    if len(movie) == 0:
+    movie = models.MovieLocation.query.filter(
+        models.MovieLocation.id == movie_id).first()
+    if movie is None:
         abort(404)
-    return jsonify({'movie': movie[0]})
+    movie = jsonify_movie_location(movie)
+    return jsonify({'movie': movie})
 
 
 @app.route('/sfmovies/api/v1.0/titles', methods=['GET'])
@@ -54,11 +103,13 @@ def titles():
 
     """
 
-    movies = models.MovieLocation.query.all()
-    movies = map(lambda movie: jsonify_movie_location(movie), movies)
-
-    titles = list(set(map(lambda m: m['title'], movies)))
+    titles = models.MovieLocation.query.with_entities(
+        models.MovieLocation.title).distinct().all()
+    titles = map(lambda title: title[0], titles)
     return jsonify({'titles': titles})
+
+
+# ## Utility functions
 
 
 def jsonify_movie_location(movie_location):

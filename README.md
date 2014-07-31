@@ -15,13 +15,17 @@ I've chosen the back-end track: include a minimal front-end (e.g. a static view,
 API docs, etc. - do not spend time on it). Write, document and test your API as
 if it will be used by other services and front-ends.
 
+Note: The front-end is not completely minimal but does provides an appropriate
+level of functionality and interaction to reflect the project solution.
+
 # Technology stack
 
 - Language: Python (basic experience)
+- Database: PostgreSQL (no experience)
 - Backend framework: Flask (no experience)
+- Caching layer: Memcached (no experience)
 - Frontend framework: None
 - Map visualization: Google maps (basic experience)
-- Database: PostgreSQL (no experience)
 
 # Design choices
 
@@ -49,6 +53,19 @@ if it will be used by other services and front-ends.
 - JavaScript code checked with the JSHint tool.
 
 ## Back-end
+
+- Implemented the back-end as a REST service:
+  - Client-server: A uniform interface separates clients from the servers, i.e.,
+    the API provided by the server.
+  - Stateless: The server stores no client context.
+  - Cacheable: The server sends a 'cache control' header with every response,
+    and it also caches requests itself.
+  - Layered system: The system is implemented such that no one layer can see
+    past the next, which allows middleware to be added or removed as
+    fitting. For example, we may easily introduce a caching layer without it
+    affecting the client.
+  - Uniform interface: All resources are accessed via the URI:
+    `/sfmovies/api/v1.0/movies/` and all results are represented using JSON.
 
 - Implemented in a test-driven fashion, but not done in the completely rigorous
   way.
