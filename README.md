@@ -67,11 +67,16 @@ level of functionality and interaction to reflect the project solution.
     fitting. For example, we may easily introduce a caching layer without it
     affecting the client.
   - Uniform interface: All resources are accessed via the URI:
-    `/sfmovies/api/v1.0/movies/` and all results are represented using JSON.
+    `/sfmovies/api/v1/movies/` and all results are represented using JSON.
 
+  - Content negotiation: Only supports "Content-type: application/json"
+
+- Wrote the REST part from scratch but could potentially have used the
+  flask-restful
 - The back-end is very restrictive as it only allows GET requests as there is no
   authentication mechanism to allow POST, PUT and DELETE to happen in a
   responsible manner.
+- It is also slacking a bit on the HATEOAS requirements of the REST principles.
 
 - Implemented in a test-driven fashion, but not in the completely rigorous way.
 - Used the Google geocoding service to obtain coordinates for each movie

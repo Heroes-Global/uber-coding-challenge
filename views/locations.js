@@ -70,7 +70,7 @@ var initializeSearchBar = function (map, infowindow) {
         source : function (request, response) {
 
             // Get movie titles and show most relevant
-            $.getJSON(BASE_URL + "v1.0/titles", function (data) {
+            $.getJSON(BASE_URL + "v1/titles", function (data) {
 
                 var term = request.term;
                 var titles = $.grep(data.titles, function (title) {
@@ -160,7 +160,7 @@ var addMarkerClickListener = function(map, marker, infowindow) {
 var addMarkers = function(title, map, infowindow) {
 
     // Get movie titles
-    $.getJSON(BASE_URL + "v1.0/movies?title=" + title, function(data) {
+    $.getJSON(BASE_URL + "v1/movies?title=" + title, function(data) {
 
         var movies = data.movies;
         for (var i = 0; i < movies.length; i++) {

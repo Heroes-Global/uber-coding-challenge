@@ -58,7 +58,7 @@ def add_header(response):
 # ## Resources
 
 
-@app.route('/sfmovies/api/v1.0/movies', methods=['GET'])
+@app.route('/sfmovies/api/v1/movies', methods=['GET'])
 @cross_origin(headers=['Content-Type'])
 def get_movies():
     """Returns a JSON representation of the locations of movies shot in San
@@ -84,7 +84,7 @@ def get_movies():
     return jsonify({'movies': movies})
 
 
-@app.route('/sfmovies/api/v1.0/movies/<int:movie_id>', methods=['GET'])
+@app.route('/sfmovies/api/v1/movies/<int:movie_id>', methods=['GET'])
 def get_movie(movie_id):
     """Return a JSON representation of a movie location shot in San Francisco.
 
@@ -98,7 +98,7 @@ def get_movie(movie_id):
     return jsonify({'movie': movie})
 
 
-@app.route('/sfmovies/api/v1.0/titles', methods=['GET'])
+@app.route('/sfmovies/api/v1/titles', methods=['GET'])
 @cross_origin(headers=['Content-Type'])
 def titles():
     """Returns a list of the titles movies shot in San Francisco.
@@ -133,5 +133,9 @@ def jsonify_movie_location(movie_location):
         'actor_2': movie_location.actor_2,
         'actor_1': movie_location.actor_1,
         'latitude': movie_location.latitude,
-        'longitude': movie_location.longitude
+        'longitude': movie_location.longitude,
+        'links': [
+            {'rel': 'self',
+             'href': '/api/v1/movies/' + str(movie_location.id)}
+        ]
     }

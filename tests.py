@@ -26,20 +26,20 @@ class TestCase(unittest.TestCase):
 
     # ## Tests
 
-    # ### API Version 1.0 tests
+    # ### API Version 1 tests
 
     # /movies
 
     def test_movies_1_0_director_should_be_charles_chaplin(self):
-        jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1.0/movies"))
+        jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1/movies"))
         assert jsonResponse['movies'][0]['director'] == "Charles Chaplin"
 
     def test_movies_1_0_title_should_be_greed(self):
-        jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1.0/movies"))
+        jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1/movies"))
         assert jsonResponse['movies'][3]['title'] == "Greed"
 
     def test_movies_1_0_writer_should_be_ben_hecht(self):
-        jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1.0/movies"))
+        jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1/movies"))
         assert jsonResponse['movies'][6]['writer'] == "Alfred A. Cohn"
 
     # /movies/<id>
@@ -47,38 +47,38 @@ class TestCase(unittest.TestCase):
     def test_movies_1_0_movie_should_have_year_1923(self):
         movieID = 3
         jsonResponse = json.load(urllib2.urlopen(
-            self.baseUrl + "v1.0/movies/" + str(movieID)))
+            self.baseUrl + "v1/movies/" + str(movieID)))
         assert jsonResponse['movie']['year'] == 1923
 
     # /movies?title
 
     def test_movie_1_0_the_jazz_singer_should_have_one_results(self):
         jsonResponse = json.load(urllib2.urlopen(
-            self.baseUrl + "v1.0/movies?title=The+Jazz+Singer"))
+            self.baseUrl + "v1/movies?title=The+Jazz+Singer"))
         assert len(jsonResponse['movies']) == 1
 
     def test_movie_1_0_greed_should_have_three_results(self):
         jsonResponse = json.load(urllib2.urlopen(
-            self.baseUrl + "v1.0/movies?title=Greed"))
+            self.baseUrl + "v1/movies?title=Greed"))
         assert len(jsonResponse['movies']) == 3
 
     # /movies?title&year
 
     def test_movie_1_0_vertigo_1958_should_have_length_16(self):
         jsonResponse = json.load(urllib2.urlopen(
-            self.baseUrl + "v1.0/movies?title=Vertigo&year=1958"))
+            self.baseUrl + "v1/movies?title=Vertigo&year=1958"))
         assert len(jsonResponse['movies']) == 16
 
     def test_movie_1_0_vertigo_1959_should_have_length_0(self):
         jsonResponse = json.load(urllib2.urlopen(
-            self.baseUrl + "v1.0/movies?title=Vertigo&year=1959"))
+            self.baseUrl + "v1/movies?title=Vertigo&year=1959"))
         assert len(jsonResponse['movies']) == 0
 
     # /titles
 
     def test_movies_1_0_fourth_title_should_be_the_matrix(self):
         jsonResponse = json.load(urllib2.urlopen(
-            self.baseUrl + "v1.0/titles"))
+            self.baseUrl + "v1/titles"))
         assert jsonResponse['titles'][3] == "The Matrix"
 
     # ### Model tests
