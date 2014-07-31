@@ -37,20 +37,16 @@ level of functionality and interaction to reflect the project solution.
 
 ## Front-end
 
-- The autocompletion search is only applied on the titles of the movies.
-  - Possible extension: Make fields like 'writer, 'director' and 'actor'
-    searchable.
-- We presume in the autocompletion that no two movies with the same 'title' has
-  been shot in San Francisco.
-  - Improvement: Filter on both 'title' and 'year'.
-- As the focus is on the backend, there is no automatic testing of the
-  front-end.
-- Likewise, minimal has been done to make the front-end backwards compatible and
-  consistent across vendors.
-- (Something about filtering on the client vs server side).
+- The autocompletion search is only applied on the titles of the movies, but the
+  API exposes resources that would allow us to extend the search to any field of
+  a movie location object, e.g., 'writer, 'director' and 'actor_1'.
+- As the focus is on the back-end, little focus has been put on:
+  - automatic testing.
+  - backwards compatible and consistency across vendors.
+  - writing perfect code.
 - Used the Google Maps API 3 to show the map and add the markers for every movie
   location.
-- JavaScript code checked with the JSHint tool.
+- The JavaScript code checked with the JSHint tool.
 
 ## Back-end
 

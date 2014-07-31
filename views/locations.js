@@ -71,7 +71,7 @@ var initializeSearchBar = function (map, infowindow) {
 
             // Get movie titles and show most relevant
             $.getJSON(
-                BASE_URL + "v1/movies?fields=title", function (data) {
+                BASE_URL + "v1/movies?fields=title,year", function (data) {
                     var term = request.term;
 
                     // Get relevant movies
@@ -82,7 +82,7 @@ var initializeSearchBar = function (map, infowindow) {
 
                     // Get their titles
                     var titles = $.map(movies, function(movie) {
-                        return movie.title;
+                        return movie.title + ' (' + movie.year + ')';
                     });
 
                     // Remove duplicates
@@ -126,9 +126,12 @@ var initializeSearchBar = function (map, infowindow) {
             }
 
             // Set search title and add markers
+            queryYear = queryTitle.substring(queryTitle.lastIndexOf('(')+1,
+                                             queryTitle.length-1);
+            queryTitle = queryTitle.substring(0, queryTitle.lastIndexOf(' ('));
             $("#" + MOVIE_INPUT).val(queryTitle);
             clearMarkers();
-            addMarkers(queryTitle, map, infowindow);
+            addMarkers(queryTitle, queryYear, map, infowindow);
         }
     });
 };
@@ -167,14 +170,16 @@ var addMarkerClickListener = function(map, marker, infowindow) {
  * specified title.
  *
  * @param {string} title The title of the movie.
+ * @param {string} year The year the movie was mode.
  * @param {Map} map The Google maps object.
  * @param {InfoWindow} infowindow The {InfoWindow} used for showing the
  * information of a {Marker}.
  */
-var addMarkers = function(title, map, infowindow) {
+var addMarkers = function(title, year, map, infowindow) {
 
     // Get movie titles
-    $.getJSON(BASE_URL + "v1/movies?title=" + title, function(data) {
+    query_string = "v1/movies?title=" + title + "&year=" + year;
+    $.getJSON(BASE_URL + query_string, function(data) {
 
         var movies = data.movies;
         for (var i = 0; i < movies.length; i++) {
