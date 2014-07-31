@@ -70,18 +70,32 @@ var initializeSearchBar = function (map, infowindow) {
         source : function (request, response) {
 
             // Get movie titles and show most relevant
-            $.getJSON(BASE_URL + "v1/titles", function (data) {
+            $.getJSON(
+                BASE_URL + "v1/movies?fields=title", function (data) {
+                    var term = request.term;
 
-                var term = request.term;
-                var titles = $.grep(data.titles, function (title) {
-                    return title.toLowerCase().indexOf(term.toLowerCase()) > -1;
-                });
+                    // Get relevant movies
+                    var movies = $.grep(data.movies, function (movie) {
+                        return movie.title.toLowerCase()
+                            .indexOf(term.toLowerCase()) > -1;
+                    });
 
-                if (titles.length > 5) {
-                    titles = titles.slice(0,5);
-                }
+                    // Get their titles
+                    var titles = $.map(movies, function(movie) {
+                        return movie.title;
+                    });
 
-                response(titles);
+                    // Remove duplicates
+                    titles = titles.filter(function(elem, pos) {
+                        return titles.indexOf(elem) == pos;
+                    });
+
+                    // Return a reasonable number of suggestions
+                    if (titles.length > 5) {
+                        titles = titles.slice(0,5);
+                    }
+
+                    response(titles);
             });
         },
     });

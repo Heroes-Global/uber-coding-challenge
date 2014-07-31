@@ -112,11 +112,9 @@ def get_movies():
                 query = query.add_column(model_field)
         query = query.add_column(models.MovieLocation.id)
 
-    # pagin
+    # paging
     if 'limit' in parameters:
-        query = query.limit(parameters['limit'])
-    else:
-        query = query.limit(20)  # Default limit
+		query = query.limit(parameters['limit'])
 
     if 'offset' in parameters:
         query = query.offset(parameters['offset'])
@@ -139,20 +137,6 @@ def get_movie(movie_id):
         abort(404)
     movie = jsonify_movie_location(movie)
     return jsonify({'movie': movie})
-
-
-@app.route('/sfmovies/api/v1/titles', methods=['GET'])
-@cross_origin(headers=['Content-Type'])
-def titles():
-    """Returns a list of the titles movies shot in San Francisco.
-
-    """
-
-    titles = models.MovieLocation.query.with_entities(
-        models.MovieLocation.title).distinct().all()
-    titles = map(lambda title: title[0], titles)
-    return jsonify({'titles': titles})
-
 
 # ## Utility functions
 
