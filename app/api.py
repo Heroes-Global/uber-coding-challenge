@@ -78,9 +78,19 @@ def get_movies():
     # filter
     for parameter in parameters:
         parameterValue = parameters[parameter]
-        modelValue = getattr(models.MovieLocation, parameter, None)
-        if modelValue is not None:
-            query = query.filter(modelValue == parameterValue)
+        if parameter.endswith('<') or parameter.endswith('>'):
+            less_or_greater_than = parameter[-1]
+            parameter = parameter[:-1]
+            modelValue = getattr(models.MovieLocation, parameter, None)
+            if less_or_greater_than == '>':
+                query = query.filter(modelValue >= parameterValue)
+            else:
+                query = query.filter(modelValue <= parameterValue)
+
+        else:
+            modelValue = getattr(models.MovieLocation, parameter, None)
+            if modelValue is not None:
+                query = query.filter(modelValue == parameterValue)
 
     # sort
     if 'sort' in parameters:
@@ -114,7 +124,7 @@ def get_movies():
 
     # paging
     if 'limit' in parameters:
-		query = query.limit(parameters['limit'])
+        query = query.limit(parameters['limit'])
 
     if 'offset' in parameters:
         query = query.offset(parameters['offset'])
