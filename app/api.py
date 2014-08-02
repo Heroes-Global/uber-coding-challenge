@@ -15,6 +15,7 @@ from werkzeug.contrib.cache import SimpleCache  # production: MemcachedCache
 
 # ## Error handling
 
+
 @app.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):
     """Handles an error caused by invalid usage of the API.
@@ -26,6 +27,7 @@ def handle_invalid_usage(error):
     response.status_code = error.status_code
     return response
 
+
 @app.errorhandler(404)
 def handle_invalid_resource_path(error):
     """
@@ -34,8 +36,8 @@ def handle_invalid_resource_path(error):
     - `error`:
     """
 
-    response = jsonify({ 'error': { 'status_code': 404,
-                                    'message': 'No resource behind the URI'}})
+    response = jsonify({'error': {'status_code': 404,
+                                  'message': 'No resource behind the URI'}})
     response.status_code = 404
     return response
 

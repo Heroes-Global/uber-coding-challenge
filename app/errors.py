@@ -1,10 +1,11 @@
-# models.py
+# errors.py
 
 # # Imports
 
 from flask import jsonify
 
 # # Errors
+
 
 class InvalidUsage(Exception):
     """Raised upon invalid usage of the API."""
@@ -29,7 +30,7 @@ class InvalidUsage(Exception):
     def to_dict(self):
         """Return a dictionary representation of the error."""
 
-        d = { 'error' : {} }
+        d = {'error': {}}
         d['error'] = self.payload or {}
         d['error']['message'] = self.message
         d['error']['status_code'] = self.status_code
