@@ -145,7 +145,7 @@ def get_movies():
     else:
         query = query.order_by('id')
 
-    # select
+    # fields
     if 'fields' in parameters:
         fields = parameters['fields'].split(",")
         for field in fields:

@@ -9,6 +9,7 @@ from config import BASE_DIR
 from app import app
 from app import models
 from app import errors
+from app import api
 
 import urllib2
 import json
@@ -154,7 +155,7 @@ class TestCase(unittest.TestCase):
             assert response['error']['message'] == \
                 "No movie with id = " + str(movieID)
 
-    # GET /movies?title
+    # GET /movies?filter
 
     # check lengths
     def test_v1_movies_the_jazz_singer_should_have_one_results(self):
@@ -189,27 +190,141 @@ class TestCase(unittest.TestCase):
         assert jsonResponse['movies'][4]['location'] == "Marina Green " + \
             "(Marina District)"
 
-    # GET /movies?year
+    def test_v1_movies_eq_1988_fourth_entry_should_title_the_dead_pool(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?year=1988"))
+        assert jsonResponse['movies'][3]['title'] == "The Dead Pool"
 
-    # GET /movies?title&year
+    def test_v1_movies_gt_1967_fifteenth_entry_should_year_1968(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?year>=1967"))
+        assert jsonResponse['movies'][15]['year'] == 1968
 
-    def test_movies_v1_vertigo_1958_should_have_length_16(self):
+    def test_v1_movies_gt_1954_twelwth_entry_should_year_1938(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?year<=1954"))
+        assert jsonResponse['movies'][12]['year'] == 1938
+
+    # GET /movies?filter2
+
+    def test_v1_movies_vertigo_1958_should_have_length_16(self):
         jsonResponse = json.load(urllib2.urlopen(
             self.baseUrl + "v1/movies?title=Vertigo&year=1958"))
         assert len(jsonResponse['movies']) == 16
 
-    def test_movies_v1_vertigo_1959_should_have_length_0(self):
+    def test_v1_movies_vertigo_1959_should_have_length_0(self):
         jsonResponse = json.load(urllib2.urlopen(
             self.baseUrl + "v1/movies?title=Vertigo&year=1959"))
         assert len(jsonResponse['movies']) == 0
 
     # GET /movies?sort
 
-    # GET /movies?director&sort
+    def test_v1_movies_sort_by_title_acc_should_have_title_a_jitney(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?sort=+title"))
+        assert jsonResponse['movies'][0]['title'] == "A Jitney Elopement"
+
+    def test_v1_movies_sort_by_title_desc_should_have_title_zodiac(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?sort=-title"))
+        assert jsonResponse['movies'][0]['title'] == "Zodiac"
+
+    # GET /movies?filter&sort
+
+    def test_v1_movies_last_hitchcock_movie_is_family_plot(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?director=Alfred+Hitchcock&sort=-year"))
+        assert jsonResponse['movies'][0]['title'] == "Family Plot"
+
+    def test_v1_movies_first_writer_in_1988_should_be_arnold_schulman(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?year=1988&sort=+writer"))
+        assert jsonResponse['movies'][0]['writer'] == "Arnold Schulman"
 
     # GET /movies?fields
 
-    # GET /movies?year&fields&sort
+    def test_v1_movies_writer_should_have_been_removed(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?fields=title,year,director"))
+        try:
+            jsonResponse['movies'][0]['writer']
+            assert False
+        except KeyError as e:
+            assert True
+
+    def test_v1_movies_actor_1_should_charles_chaplin(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?fields=actor_1,year,title"))
+        assert jsonResponse['movies'][0]['actor_1'] == "Charles Chaplin"
+
+    # GET /movies?sort&fields
+
+    def test_v1_movies_last_movie_should_be_about_a_boy(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?fields=title,year,actor_1&sort=-year"))
+        assert jsonResponse['movies'][0]['title'] == "About a Boy"
+
+    # GET /movies?filter&sort&fields
+
+    def test_v1_movies_last_actor_1_should_be_cate_blanchett(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?director=Woody+Allen" + \
+            "&fields=title,year,actor_1&sort=-year"))
+        assert jsonResponse['movies'][2]['actor_1'] == "Cate Blanchett"
+
+    # GET /movies?paging
+
+    def test_v1_movies_limit_should_be_15(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?limit=15"))
+        assert len(jsonResponse['movies']) == 15
+
+    def test_v1_movies_offset_actor_2_should_be_jeanette_macdonald(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?offset=8"))
+        assert jsonResponse['movies'][0]['actor_2'] == "Jeanette MacDonald"
+
+    # GET /movies?fields&paging
+
+    def test_v1_movies_location_should_be_coit_tower(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?year=2000&offset=3&limit=7"))
+        assert jsonResponse['movies'][-1]['location'] == "Coit Tower"
+
+    # GET /movies?sort&fields&paging
+
+    def test_v1_movies_id_should_be_708(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?year=2000&offset=3&limit=7" + \
+            "&sort=+production_company"))
+        assert jsonResponse['movies'][-1]['id'] == 708
+
+    # GET /movies?filter&sort&fields&paging
+
+    def test_v1_movies_second_last_title_should_be_under_the_tuscan_sun(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?year=2003&offset=2&limit=5" + \
+            "&sort=-director&fields=writer,title"))
+        assert jsonResponse['movies'][-2]['title'] == "Under the Tuscan Sun"
+
+    # Jsonify_movie_location
+
+    def test_jsonify_movie_location_should_preserve_fields(self):
+        vertigo = models.MovieLocation(
+            title="Vertigo",
+            year=1958,
+            location="San Francisco Drydock (20th and Illinois Streets)",
+            fun_fact="",
+            production_company="Alfred J. Hitchcock Productions",
+            distributor="Paramount Pictures",
+            director="Alfred Hitchcock",
+            writer="Alec Coppel",
+            actor_1="James Stewart",
+            actor_2="Kim Novak",
+            latitude=37.7561141,
+            longitude=-122.3871395)
+        jsonVertigo = api.jsonify_movie_location(vertigo)
+        assert jsonVertigo['writer'] == "Alec Coppel"
 
     # ### Model tests
 
