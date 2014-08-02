@@ -2,12 +2,42 @@
 
 # ## Imports
 
-from flask import url_for, jsonify, abort, request
+from flask import url_for, abort, jsonify, request
 from flask.ext.cors import cross_origin
 from app import app
 from app import models
 from app import db
+from app import errors
+from errors import InvalidUsage
+from models import MovieLocation
+
 from werkzeug.contrib.cache import SimpleCache  # production: MemcachedCache
+
+# ## Error handling
+
+@app.errorhandler(InvalidUsage)
+def handle_invalid_usage(error):
+    """Handles an error caused by invalid usage of the API.
+
+    Arguments:
+    - `error`:
+    """
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
+
+@app.errorhandler(404)
+def handle_invalid_resource_path(error):
+    """
+
+    Arguments:
+    - `error`:
+    """
+
+    response = jsonify({ 'error': { 'status_code': 404,
+                                    'message': 'No resource behind the URI'}})
+    response.status_code = 404
+    return response
 
 # ## Caching
 
@@ -66,7 +96,7 @@ def get_movies():
 
     """
 
-    query = models.MovieLocation.query
+    query = MovieLocation.query
     parameters = {}
 
     # Get parameters
@@ -81,14 +111,14 @@ def get_movies():
         if parameter.endswith('<') or parameter.endswith('>'):
             less_or_greater_than = parameter[-1]
             parameter = parameter[:-1]
-            modelValue = getattr(models.MovieLocation, parameter, None)
+            modelValue = getattr(MovieLocation, parameter, None)
             if less_or_greater_than == '>':
                 query = query.filter(modelValue >= parameterValue)
             else:
                 query = query.filter(modelValue <= parameterValue)
 
         else:
-            modelValue = getattr(models.MovieLocation, parameter, None)
+            modelValue = getattr(MovieLocation, parameter, None)
             if modelValue is not None:
                 query = query.filter(modelValue == parameterValue)
 
@@ -98,16 +128,16 @@ def get_movies():
         order = sort_field[0]
         if order == '-':
             sort_field = sort_field[1:]
-            model_field = getattr(models.MovieLocation, sort_field, None)
+            model_field = getattr(MovieLocation, sort_field, None)
             if model_field is not None:
                 query = query.order_by(model_field.desc())
         elif order == '+':
             sort_field = sort_field[1:]
-            model_field = getattr(models.MovieLocation, sort_field, None)
+            model_field = getattr(MovieLocation, sort_field, None)
             if model_field is not None:
                 query = query.order_by(model_field)
         else:
-            model_field = getattr(models.MovieLocation, sort_field, None)
+            model_field = getattr(MovieLocation, sort_field, None)
             if model_field is not None:
                 query = query.order_by(model_field)
     else:
@@ -117,10 +147,10 @@ def get_movies():
     if 'fields' in parameters:
         fields = parameters['fields'].split(",")
         for field in fields:
-            model_field = getattr(models.MovieLocation, field, None)
+            model_field = getattr(MovieLocation, field, None)
             if model_field is not None:
                 query = query.add_column(model_field)
-        query = query.add_column(models.MovieLocation.id)
+        query = query.add_column(MovieLocation.id)
 
     # paging
     if 'limit' in parameters:
@@ -141,10 +171,15 @@ def get_movie(movie_id):
 
     """
 
-    movie = models.MovieLocation.query.filter(
-        models.MovieLocation.id == movie_id).first()
+    movie = MovieLocation.query.filter(
+        MovieLocation.id == movie_id).first()
     if movie is None:
-        abort(404)
+        raise InvalidUsage('No movie with id = ' + str(movie_id),
+                           status_code=404,
+                           payload={'links': [
+                               {'href': '/api/v1/movies/' + str(movie_id),
+                                'rel': 'self'}
+                           ]})
     movie = jsonify_movie_location(movie)
     return jsonify({'movie': movie})
 

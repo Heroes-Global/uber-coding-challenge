@@ -6,7 +6,10 @@ import os
 import unittest
 
 from config import BASE_DIR
-from app import app, models
+from app import app
+from app import models
+from app import errors
+
 import urllib2
 import json
 
@@ -27,6 +30,16 @@ class TestCase(unittest.TestCase):
     # ## Tests
 
     # ### API Version 1 tests
+
+    # GET /moviesnotthere
+
+    def test_v1_moviesnotthere_should_have_error_message(self):
+        try:
+            urllib2.urlopen(self.baseUrl + "v1/moviesnotthere")
+            assert False  # Should not get here
+        except Exception as e:
+            response = json.loads(e.read())
+            assert response['error']['message'] == "No resource behind the URI"
 
     # GET /movies
 
@@ -121,6 +134,25 @@ class TestCase(unittest.TestCase):
         jsonResponse = json.load(urllib2.urlopen(
             self.baseUrl + "v1/movies/" + str(movieID)))
         assert jsonResponse['movie']['writer'] == "Alan R. Trustman"
+
+    def test_v1_movies_id_0_should_have_status_code_404(self):
+        movieID = 0
+        try:
+            urllib2.urlopen(self.baseUrl + "v1/movies/" + str(movieID))
+            assert False  # Should not get here
+        except Exception as e:
+            response = json.loads(e.read())
+            assert response['error']['status_code'] == 404
+
+    def test_v1_movies_id_12345_should_have_error_message(self):
+        movieID = 12345
+        try:
+            urllib2.urlopen(self.baseUrl + "v1/movies/" + str(movieID))
+            assert False  # Should not get here
+        except Exception as e:
+            response = json.loads(e.read())
+            assert response['error']['message'] == \
+                "No movie with id = " + str(movieID)
 
     # GET /movies?title
 
