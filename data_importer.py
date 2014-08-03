@@ -49,10 +49,8 @@ def main():
         longitude = movie['longitude']
 
         fun_fact = movie['fun_facts'].strip() if 'fun_facts' in movie else ""
-        production_company = movie['production_company'].strip() if
-        'production_company' in movie else ""
-        distributor = movie['distributor'].strip() if
-        'distributor' in movie else ""
+        production_company = movie['production_company'].strip() if 'production_company' in movie else ""
+        distributor = movie['distributor'].strip() if 'distributor' in movie else ""
         director = movie['director'].strip() if 'director' in movie else ""
         writer = movie['writer'].strip() if 'writer' in movie else ""
         actor_1 = movie['actor_1'].strip() if 'actor_1' in movie else ""

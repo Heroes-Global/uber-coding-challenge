@@ -10,6 +10,7 @@ from app import db
 from app import errors
 from errors import InvalidUsage
 from models import MovieLocation
+import urllib2
 
 from werkzeug.contrib.cache import SimpleCache  # production: MemcachedCache
 
@@ -98,6 +99,12 @@ def get_movies():
 
     """
 
+    PROPERTIES = ['id', 'title', 'writer', 'actor_1', 'actor_2', 'actor_3',
+                  'director', 'distributor', 'production_company', 'location',
+                  'year', 'fun_fact', 'latitude', 'longitude']
+
+    KEYWORDS = ['sort', 'fields', 'limit', 'offset']
+
     query = MovieLocation.query
     parameters = {}
 
@@ -109,17 +116,26 @@ def get_movies():
 
     # filter
     for parameter in parameters:
+
+        if parameter in KEYWORDS:
+            continue
+
         parameterValue = parameters[parameter]
         if parameter.endswith('<') or parameter.endswith('>'):
+
             less_or_greater_than = parameter[-1]
             parameter = parameter[:-1]
+            check_parameter_name(parameter, parameterValue, PROPERTIES)
             modelValue = getattr(MovieLocation, parameter, None)
-            if less_or_greater_than == '>':
-                query = query.filter(modelValue >= parameterValue)
-            else:
-                query = query.filter(modelValue <= parameterValue)
+            if modelValue is not None:
+                if less_or_greater_than == '>':
+                    query = query.filter(modelValue >= parameterValue)
+                else:
+                    query = query.filter(modelValue <= parameterValue)
 
         else:
+
+            check_parameter_name(parameter, parameterValue, PROPERTIES)
             modelValue = getattr(MovieLocation, parameter, None)
             if modelValue is not None:
                 query = query.filter(modelValue == parameterValue)
@@ -127,18 +143,16 @@ def get_movies():
     # sort
     if 'sort' in parameters:
         sort_field = parameters['sort']
-        order = sort_field[0]
-        if order == '-':
+
+        if sort_field.startswith('-'):
             sort_field = sort_field[1:]
+            check_field(sort_field, PROPERTIES)
             model_field = getattr(MovieLocation, sort_field, None)
             if model_field is not None:
                 query = query.order_by(model_field.desc())
-        elif order == '+':
-            sort_field = sort_field[1:]
-            model_field = getattr(MovieLocation, sort_field, None)
-            if model_field is not None:
-                query = query.order_by(model_field)
+
         else:
+            check_field(sort_field, PROPERTIES)
             model_field = getattr(MovieLocation, sort_field, None)
             if model_field is not None:
                 query = query.order_by(model_field)
@@ -149,6 +163,7 @@ def get_movies():
     if 'fields' in parameters:
         fields = parameters['fields'].split(",")
         for field in fields:
+            check_field(field, PROPERTIES)
             model_field = getattr(MovieLocation, field, None)
             if model_field is not None:
                 query = query.add_column(model_field)
@@ -156,9 +171,13 @@ def get_movies():
 
     # paging
     if 'limit' in parameters:
-        query = query.limit(parameters['limit'])
+        limit = parameters['limit']
+        check_paging_value('limit', limit)
+        query = query.limit(limit)
 
     if 'offset' in parameters:
+        offset = parameters['offset']
+        check_paging_value('offset', offset)
         query = query.offset(parameters['offset'])
 
     movies = query.all()
@@ -186,6 +205,93 @@ def get_movie(movie_id):
     return jsonify({'movie': movie})
 
 # ## Utility functions
+
+
+def raise_invalid_parameter(parameter):
+    """Raises an error when an invalid parameter is passed in the query string.
+
+    Arguments:
+    - `parameter`:
+    """
+    url = request.url
+    api_index = url.index('/api/')
+    url_suffix = urllib2.unquote(request.url[api_index:])
+    raise InvalidUsage('Invalid parameter: {}'.format(parameter),
+                       status_code=400,
+                       payload={'links': [
+                           {'href': url_suffix,
+                            'rel': 'self'}]})
+
+
+def check_paging_value(parameter, value):
+    """Check that a paging value is an integer.
+
+    Arguments:
+    - `value`:
+    """
+    try:
+        int(value)
+    except:
+        raise_invalid_parameter_value(parameter, value)
+
+
+def check_field(field, properties):
+    """Check that a field exists.
+
+    Arguments:
+    - `field`:
+    - `properties`:
+    """
+    if field not in properties:
+        raise_invalid_parameter_value('sort', field)
+
+
+def check_parameter_name(parameter, value, properties):
+    """Checks if a parameter name is valid, raises an error if this is not the
+    case.
+
+    Arguments:
+    - `parameter`:
+    - `value`:
+    - `properties`:
+    """
+    if parameter not in properties:
+        raise_invalid_parameter(parameter)
+
+    if value == "":
+        raise_invalid_parameter_value(parameter, "")
+
+    if (parameter == 'id' or parameter == 'year'):
+        try:
+            int(value)
+        except:
+            raise_invalid_parameter_value(parameter, value)
+
+    if (parameter == 'longitude' or parameter == 'latitude'):
+        try:
+            float(value)
+        except:
+            raise_invalid_parameter_value(parameter, value)
+
+
+def raise_invalid_parameter_value(parameter, value):
+    """Raises an error when an invalid parameter value is passed in the query
+    string.
+
+    Arguments:
+    - `parameter`:
+    - `value`:
+    """
+    url = request.url
+    api_index = url.index('/api/')
+    url_suffix = urllib2.unquote(request.url[api_index:])
+    raise InvalidUsage('Invalid value: {},'.format(value) +
+                       ' for parameter: {}'.format(parameter),
+                       status_code=400,
+                       payload={'links': [{
+                           'href': url_suffix,
+                           'rel': 'self'
+                       }]})
 
 
 def jsonify_movie_location(movie_location):

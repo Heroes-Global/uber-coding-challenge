@@ -4,15 +4,14 @@
 
 import os
 import unittest
+import urllib2
+import json
 
 from config import BASE_DIR
 from app import app
 from app import models
 from app import errors
 from app import api
-
-import urllib2
-import json
 
 # # Classes
 
@@ -59,28 +58,6 @@ class TestCase(unittest.TestCase):
     def test_v1_movies_location_should_be_bay_bridge(self):
         jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1/movies"))
         assert jsonResponse['movies'][15]['location'] == "Ferry Building"
-
-    def test_v1_movies_fun_fact_should_be_exteriors_etc(self):
-        jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1/movies"))
-        assert jsonResponse['movies'][2]['fun_fact'] == "Exteriors of the " + \
-            "church were used."
-
-    def test_v1_movies_production_company__should_be_rko(self):
-        jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1/movies"))
-        assert jsonResponse['movies'][27]['production_company'] == "RKO " + \
-            "Radio Pictures"
-
-    def test_v1_movies_distributor_should_be_united_artists(self):
-        jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1/movies"))
-        assert jsonResponse['movies'][30]['distributor'] == "United Artists"
-
-    def test_v1_movies_director_should_be_charles_chaplin(self):
-        jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1/movies"))
-        assert jsonResponse['movies'][0]['director'] == "Charles Chaplin"
-
-    def test_v1_movies_writer_should_be_ben_hecht(self):
-        jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1/movies"))
-        assert jsonResponse['movies'][6]['writer'] == "Alfred A. Cohn"
 
     def test_v1_movies_actor_1_should_be_clark_gable(self):
         jsonResponse = json.load(urllib2.urlopen(self.baseUrl + "v1/movies"))
@@ -136,6 +113,8 @@ class TestCase(unittest.TestCase):
             self.baseUrl + "v1/movies/" + str(movieID)))
         assert jsonResponse['movie']['writer'] == "Alan R. Trustman"
 
+    # errors
+
     def test_v1_movies_id_0_should_have_status_code_404(self):
         movieID = 0
         try:
@@ -158,6 +137,7 @@ class TestCase(unittest.TestCase):
     # GET /movies?filter
 
     # check lengths
+
     def test_v1_movies_the_jazz_singer_should_have_one_results(self):
         jsonResponse = json.load(urllib2.urlopen(
             self.baseUrl + "v1/movies?title=The+Jazz+Singer"))
@@ -173,7 +153,8 @@ class TestCase(unittest.TestCase):
             self.baseUrl + "v1/movies?title=Jam"))
         assert len(jsonResponse['movies']) == 0
 
-    # check properties
+    # title
+
     def test_v1_movies_bullitt_should_have_title_bullitt(self):
         jsonResponse = json.load(urllib2.urlopen(
             self.baseUrl + "v1/movies?title=Bullitt"))
@@ -190,20 +171,68 @@ class TestCase(unittest.TestCase):
         assert jsonResponse['movies'][4]['location'] == "Marina Green " + \
             "(Marina District)"
 
-    def test_v1_movies_eq_1988_fourth_entry_should_title_the_dead_pool(self):
+    # year
+
+    def test_v1_movies_year_eq_1988_fourth_entry_should_title_dead_pool(self):
         jsonResponse = json.load(urllib2.urlopen(
             self.baseUrl + "v1/movies?year=1988"))
         assert jsonResponse['movies'][3]['title'] == "The Dead Pool"
 
-    def test_v1_movies_gt_1967_fifteenth_entry_should_year_1968(self):
+    def test_v1_movies_year_gt_1967_fifteenth_entry_should_year_1968(self):
         jsonResponse = json.load(urllib2.urlopen(
             self.baseUrl + "v1/movies?year>=1967"))
         assert jsonResponse['movies'][15]['year'] == 1968
 
-    def test_v1_movies_gt_1954_twelwth_entry_should_year_1938(self):
+    def test_v1_movies_year_gt_1954_twelwth_entry_should_year_1938(self):
         jsonResponse = json.load(urllib2.urlopen(
             self.baseUrl + "v1/movies?year<=1954"))
         assert jsonResponse['movies'][12]['year'] == 1938
+
+    # error
+
+    def test_v1_movie_year_eq_horse_should_give_error(self):
+        try:
+            urllib2.urlopen(self.baseUrl + "v1/movies?year=horse")
+            assert False  # Should not get here
+        except Exception as e:
+            response = json.loads(e.read())
+            assert response['error']['status_code'] == 400
+
+    def test_v1_movie_year_gt_helicopter_should_give_error(self):
+        try:
+            urllib2.urlopen(self.baseUrl + "v1/movies?year>=helicopter")
+            assert False  # Should not get here
+        except Exception as e:
+            response = json.loads(e.read())
+            assert response['error']['status_code'] == 400
+
+    # latitude/longitude
+
+    def test_v1_latitude_eq_376909682_title_should_be_the_rock(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?latitude=37.6909682"))
+        assert jsonResponse['movies'][1]['title'] == "The Rock"
+
+    def test_v1_longitude_eq_122408092_director_should_be_norman_foster(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?longitude=-122.408092"))
+        assert jsonResponse['movies'][0]['director'] == "Norman Foster"
+
+    def test_v1_latitude_eq_horse_should_raise_error(self):
+        try:
+            urllib2.urlopen(self.baseUrl + "v1/movies?latitude=horse")
+            assert False  # Should not get here
+        except Exception as e:
+            response = json.loads(e.read())
+            assert response['error']['status_code'] == 400
+
+    def test_v1_longitude_eq_foo_should_raise_error(self):
+        try:
+            urllib2.urlopen(self.baseUrl + "v1/movies?longitude=foo")
+            assert False  # Should not get here
+        except Exception as e:
+            response = json.loads(e.read())
+            assert response['error']['status_code'] == 400
 
     # GET /movies?filter2
 
@@ -221,13 +250,29 @@ class TestCase(unittest.TestCase):
 
     def test_v1_movies_sort_by_title_acc_should_have_title_a_jitney(self):
         jsonResponse = json.load(urllib2.urlopen(
-            self.baseUrl + "v1/movies?sort=+title"))
-        assert jsonResponse['movies'][0]['title'] == "A Jitney Elopement"
+            self.baseUrl + "v1/movies?sort=title"))
+        assert jsonResponse['movies'][0]['title'] == "180"
 
     def test_v1_movies_sort_by_title_desc_should_have_title_zodiac(self):
         jsonResponse = json.load(urllib2.urlopen(
             self.baseUrl + "v1/movies?sort=-title"))
         assert jsonResponse['movies'][0]['title'] == "Zodiac"
+
+    def test_v1_movies_sort_by_bar_asc_should_raise_error(self):
+        try:
+            urllib2.urlopen(self.baseUrl + "v1/movies?sort=bar")
+            assert False  # Should not get here
+        except Exception as e:
+            response = json.loads(e.read())
+            assert response['error']['status_code'] == 400
+
+    def test_v1_movies_sort_by_baz_desc_should_raise_error(self):
+        try:
+            urllib2.urlopen(self.baseUrl + "v1/movies?sort=-baz")
+            assert False  # Should not get here
+        except Exception as e:
+            response = json.loads(e.read())
+            assert response['error']['status_code'] == 400
 
     # GET /movies?filter&sort
 
@@ -238,7 +283,7 @@ class TestCase(unittest.TestCase):
 
     def test_v1_movies_first_writer_in_1988_should_be_arnold_schulman(self):
         jsonResponse = json.load(urllib2.urlopen(
-            self.baseUrl + "v1/movies?year=1988&sort=+writer"))
+            self.baseUrl + "v1/movies?year=1988&sort=writer"))
         assert jsonResponse['movies'][0]['writer'] == "Arnold Schulman"
 
     # GET /movies?fields
@@ -251,6 +296,14 @@ class TestCase(unittest.TestCase):
             assert False
         except KeyError as e:
             assert True
+
+    def test_v1_movies_wrong_field_should_raise_error(self):
+        try:
+            urllib2.urlopen(self.baseUrl + "v1/movies?fields=title,baz")
+            assert False  # Should not get here
+        except Exception as e:
+            response = json.loads(e.read())
+            assert response['error']['status_code'] == 400
 
     def test_v1_movies_actor_1_should_charles_chaplin(self):
         jsonResponse = json.load(urllib2.urlopen(
@@ -268,7 +321,7 @@ class TestCase(unittest.TestCase):
 
     def test_v1_movies_last_actor_1_should_be_cate_blanchett(self):
         jsonResponse = json.load(urllib2.urlopen(
-            self.baseUrl + "v1/movies?director=Woody+Allen" + \
+            self.baseUrl + "v1/movies?director=Woody+Allen" +
             "&fields=title,year,actor_1&sort=-year"))
         assert jsonResponse['movies'][2]['actor_1'] == "Cate Blanchett"
 
@@ -279,10 +332,26 @@ class TestCase(unittest.TestCase):
             self.baseUrl + "v1/movies?limit=15"))
         assert len(jsonResponse['movies']) == 15
 
+    def test_v1_movies_limit_invalid_value_should_raise_error(self):
+        try:
+            urllib2.urlopen(self.baseUrl + "v1/movies?limit=foobar")
+            assert False  # Should not get here
+        except Exception as e:
+            response = json.loads(e.read())
+            assert response['error']['status_code'] == 400
+
     def test_v1_movies_offset_actor_2_should_be_jeanette_macdonald(self):
         jsonResponse = json.load(urllib2.urlopen(
             self.baseUrl + "v1/movies?offset=8"))
         assert jsonResponse['movies'][0]['actor_2'] == "Jeanette MacDonald"
+
+    def test_v1_movies_offset_invalid_value_should_raise_error(self):
+        try:
+            urllib2.urlopen(self.baseUrl + "v1/movies?offset=horse")
+            assert False  # Should not get here
+        except Exception as e:
+            response = json.loads(e.read())
+            assert response['error']['status_code'] == 400
 
     # GET /movies?fields&paging
 
@@ -293,17 +362,17 @@ class TestCase(unittest.TestCase):
 
     # GET /movies?sort&fields&paging
 
-    def test_v1_movies_id_should_be_708(self):
+    def test_v1_movies_id_should_be_705(self):
         jsonResponse = json.load(urllib2.urlopen(
-            self.baseUrl + "v1/movies?year=2000&offset=3&limit=7" + \
-            "&sort=+production_company"))
-        assert jsonResponse['movies'][-1]['id'] == 708
+            self.baseUrl + "v1/movies?year=2000&offset=3&limit=7" +
+            "&sort=production_company"))
+        assert jsonResponse['movies'][-1]['id'] == 705
 
     # GET /movies?filter&sort&fields&paging
 
     def test_v1_movies_second_last_title_should_be_under_the_tuscan_sun(self):
         jsonResponse = json.load(urllib2.urlopen(
-            self.baseUrl + "v1/movies?year=2003&offset=2&limit=5" + \
+            self.baseUrl + "v1/movies?year=2003&offset=2&limit=5" +
             "&sort=-director&fields=writer,title"))
         assert jsonResponse['movies'][-2]['title'] == "Under the Tuscan Sun"
 
