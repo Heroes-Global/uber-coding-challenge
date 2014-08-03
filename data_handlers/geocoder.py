@@ -43,9 +43,9 @@ def main():
             continue
 
         encodedLocation = urllib2.quote(movie['locations'].encode("utf8"))
-        requestUrl = "https://maps.googleapis.com/maps/api/geocode/" +
-        "json?address=" + encodedLocation +
-        ",+San+Francisco,+CA&key=" + SERVER_KEY
+        requestUrl = "https://maps.googleapis.com/maps/api/geocode/" + \
+					 "json?address=" + encodedLocation + \
+									 ",+San+Francisco,+CA&key=" + SERVER_KEY
         print requestUrl
         jsonResponse = json.load(urllib2.urlopen(requestUrl))
 

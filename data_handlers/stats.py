@@ -46,47 +46,47 @@ def main():
 
         keys = movie.keys()
 
-        if 'title' in keys and
-        len(movie['title']) > title_length:
+        if 'title' in keys and \
+		   len(movie['title']) > title_length:
             title_length = len(movie['title'])
 
-        if 'release_year' in keys and
-        len(movie['release_year']) > release_year_length:
+        if 'release_year' in keys and \
+		   len(movie['release_year']) > release_year_length:
             release_year_length = len(movie['release_year'])
 
-        if 'locations' in keys and
-        len(movie['locations']) > locations_length:
+        if 'locations' in keys and \
+		   len(movie['locations']) > locations_length:
             locations_length = len(movie['locations'])
 
-        if 'fun_facts' in keys and
-        len(movie['fun_facts']) > fun_facts_length:
+        if 'fun_facts' in keys and \
+		   len(movie['fun_facts']) > fun_facts_length:
             fun_facts_length = len(movie['fun_facts'])
 
-        if 'production_company' in keys and
-        len(movie['production_company']) > production_company_length:
+        if 'production_company' in keys and \
+		   len(movie['production_company']) > production_company_length:
             production_company_length = len(movie['production_company'])
 
-        if 'distributor' in keys and
-        len(movie['distributor']) > distributor_length:
+        if 'distributor' in keys and \
+		   len(movie['distributor']) > distributor_length:
             distributor_length = len(movie['distributor'])
 
-        if 'director' in keys and
-        len(movie['director']) > director_length:
+        if 'director' in keys and \
+		   len(movie['director']) > director_length:
             director_length = len(movie['director'])
 
-        if 'writer' in keys and
+        if 'writer' in keys and \
         len(movie['writer']) > writer_length:
             writer_length = len(movie['writer'])
 
-        if 'actor_1' in keys and
+        if 'actor_1' in keys and \
         len(movie['actor_1']) > actor_1_length:
             actor_1_length = len(movie['actor_1'])
 
-        if 'actor_2' in keys and
+        if 'actor_2' in keys and \
         len(movie['actor_2']) > actor_2_length:
             actor_2_length = len(movie['actor_2'])
 
-        if 'actor_3' in keys and
+        if 'actor_3' in keys and \
         len(movie['actor_3']) > actor_3_length:
             actor_3_length = len(movie['actor_3'])
 

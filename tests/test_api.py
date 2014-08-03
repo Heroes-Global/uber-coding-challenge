@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# tests/test_api.py
 
 # # Imports
 
@@ -6,6 +6,7 @@ import os
 import unittest
 import urllib2
 import json
+from nose.tools import *
 
 from config import BASE_DIR
 from app import app
@@ -16,7 +17,7 @@ from app import api
 # # Classes
 
 
-class TestCase(unittest.TestCase):
+class APITestCase(unittest.TestCase):
 
     # ## Scaffolding
 
@@ -394,42 +395,3 @@ class TestCase(unittest.TestCase):
             longitude=-122.3871395)
         jsonVertigo = api.jsonify_movie_location(vertigo)
         assert jsonVertigo['writer'] == "Alec Coppel"
-
-    # ### Model tests
-
-    def test_model_greed_should_have_actor_zasu_pitts(self):
-        greed = models.MovieLocation(
-            title='Greed',
-            year=1924,
-            location='Hayes Street at Laguna',
-            fun_fact='',
-            production_company='Metro-Goldwyn-Mayer (MGM)',
-            distributor='Metro-Goldwyn-Mayer (MGM)',
-            director='Eric von Stroheim',
-            writer='Eric von Stroheim',
-            actor_1='Zasu Pitts',
-            actor_2='',
-            actor_3='Cloris Leachman',
-            latitude=37.7764647,
-            longitude=-122.4262985)
-        assert greed.actor_1 == 'Zasu Pitts'
-
-    def test_model_vertigo_should_have_year_director_alfred_hitchcock(self):
-        vertigo = models.MovieLocation(
-            title="Vertigo",
-            year=1958,
-            location="San Francisco Drydock (20th and Illinois Streets)",
-            fun_fact="",
-            production_company="Alfred J. Hitchcock Productions",
-            distributor="Paramount Pictures",
-            director="Alfred Hitchcock",
-            writer="Alec Coppel",
-            actor_1="James Stewart",
-            actor_2="Kim Novak",
-            latitude=37.7561141,
-            longitude=-122.3871395)
-        assert vertigo.director == 'Alfred Hitchcock'
-
-
-if __name__ == '__main__':
-    unittest.main()
