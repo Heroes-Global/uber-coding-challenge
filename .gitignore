@@ -63,3 +63,6 @@ views/jquery-*.js
 
 # Application config file
 config.py
+
+# Data files
+data/
