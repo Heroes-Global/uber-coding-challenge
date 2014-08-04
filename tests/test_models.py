@@ -15,10 +15,10 @@ class ModelsTestCase(unittest.TestCase):
     # ## Scaffolding
 
     def setUp(self):
-		pass
+        pass
 
     def tearDown(self):
-		pass
+        pass
 
     # ## Tests
 
