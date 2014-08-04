@@ -7,7 +7,7 @@ SF Movies: Create a service that shows on a map where movies have been filmed in
 San Francisco. The user should be able to filter the view using autocompletion
 search.
 
-- The project is hosted on [heroku](http://urbak-sfmovies.herokuapp.com/).
+- The project is hosted on [heroku](http://urbak-sfmovies.herokuapp.com/sfmovies/)
 - The source code is located on
   [github](https://github.com/dragonwasrobot/uber-coding-challenge).
 - Documentation of how to use the API is located at [API docs](http://urbak-sfmovies.herokuapp.com/sfmovies/api/v1/).
