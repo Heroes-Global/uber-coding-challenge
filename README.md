@@ -96,9 +96,3 @@ which would also be the next issues to address if given more time.
 - Used the Google Maps API 3 to show the map and add the markers for every movie
   location.
 - The JavaScript code checked with the JSHint tool.
-
-
-# Misc
-
-Link to other code you're particularly proud of.
-Link to your resume or public profile.
