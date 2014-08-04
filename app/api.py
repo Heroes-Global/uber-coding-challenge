@@ -22,8 +22,9 @@ def handle_invalid_usage(error):
     """Handles an error caused by invalid usage of the API.
 
     Arguments:
-    - `error`:
+    - `error`: the error to handle.
     """
+
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
@@ -31,10 +32,10 @@ def handle_invalid_usage(error):
 
 @app.errorhandler(404)
 def handle_invalid_resource_path(error):
-    """
+    """Handles requests to invalid resource paths.
 
     Arguments:
-    - `error`:
+    - `error`: the error to handle.
     """
 
     response = jsonify({'error': {'status_code': 404,
@@ -45,7 +46,7 @@ def handle_invalid_resource_path(error):
 # ## Caching
 
 
-cache = SimpleCache()  # production: cache = MemcachedCache([''])
+cache = SimpleCache()  # production: cache = MemcachedCache(['...'])
 
 CLIENT_CACHE_TIMEOUT = 300
 SERVER_CACHE_TIMEOUT = 300
@@ -53,9 +54,7 @@ SERVER_CACHE_TIMEOUT = 300
 
 @app.before_request
 def return_cached():
-    """Checks if request is already cached.
-
-    """
+    """Checks if the request is already cached."""
 
     if not request.values:
         response = cache.get(request.path)
@@ -68,7 +67,7 @@ def cache_response(response):
     """Caches a response.
 
     Arguments:
-    - `response`:
+    - `response`: the request response to cache.
     """
 
     STATUS_OK = 200
@@ -80,11 +79,12 @@ def cache_response(response):
 
 @app.after_request
 def add_header(response):
-    """
+    """Adds extra headers to the response.
 
     Arguments:
-    - `response`:
+    - `response`: the response to be augmented.
     """
+
     response.cache_control.max_age = CLIENT_CACHE_TIMEOUT
     return response
 
@@ -95,9 +95,7 @@ def add_header(response):
 @cross_origin(headers=['Content-Type'])
 def get_movies():
     """Returns a JSON representation of the locations of movies shot in San
-    Francisco.
-
-    """
+    Francisco."""
 
     PROPERTIES = ['id', 'title', 'writer', 'actor_1', 'actor_2', 'actor_3',
                   'director', 'distributor', 'production_company', 'location',
@@ -117,28 +115,26 @@ def get_movies():
     # filter
     for parameter in parameters:
 
+        # sanity check
         if parameter in KEYWORDS:
             continue
-
         parameterValue = parameters[parameter]
-        if parameter.endswith('<') or parameter.endswith('>'):
 
+        if parameter.endswith('<') or parameter.endswith('>'):
             less_or_greater_than = parameter[-1]
             parameter = parameter[:-1]
             check_parameter_name(parameter, parameterValue, PROPERTIES)
             modelValue = getattr(MovieLocation, parameter, None)
-            if modelValue is not None:
-                if less_or_greater_than == '>':
-                    query = query.filter(modelValue >= parameterValue)
-                else:
-                    query = query.filter(modelValue <= parameterValue)
+
+            if less_or_greater_than == '>':
+                query = query.filter(modelValue >= parameterValue)
+            else:
+                query = query.filter(modelValue <= parameterValue)
 
         else:
-
             check_parameter_name(parameter, parameterValue, PROPERTIES)
             modelValue = getattr(MovieLocation, parameter, None)
-            if modelValue is not None:
-                query = query.filter(modelValue == parameterValue)
+            query = query.filter(modelValue == parameterValue)
 
     # sort
     if 'sort' in parameters:
@@ -146,27 +142,26 @@ def get_movies():
 
         if sort_field.startswith('-'):
             sort_field = sort_field[1:]
-            check_field(sort_field, PROPERTIES)
+            check_field('sort', sort_field, PROPERTIES)
             model_field = getattr(MovieLocation, sort_field, None)
-            if model_field is not None:
-                query = query.order_by(model_field.desc())
+            query = query.order_by(model_field.desc())
 
         else:
-            check_field(sort_field, PROPERTIES)
+            check_field('sort', sort_field, PROPERTIES)
             model_field = getattr(MovieLocation, sort_field, None)
-            if model_field is not None:
-                query = query.order_by(model_field)
+            query = query.order_by(model_field)
     else:
         query = query.order_by('id')
 
     # fields
     if 'fields' in parameters:
         fields = parameters['fields'].split(",")
+
         for field in fields:
-            check_field(field, PROPERTIES)
+            check_field('fields', field, PROPERTIES)
             model_field = getattr(MovieLocation, field, None)
-            if model_field is not None:
-                query = query.add_column(model_field)
+            query = query.add_column(model_field)
+
         query = query.add_column(MovieLocation.id)
 
     # paging
@@ -190,6 +185,8 @@ def get_movies():
 def get_movie(movie_id):
     """Return a JSON representation of a movie location shot in San Francisco.
 
+    Arguments:
+    - `movie_id`: the id of the movie to be retrieved.
     """
 
     movie = MovieLocation.query.filter(
@@ -206,13 +203,69 @@ def get_movie(movie_id):
 
 # ## Utility functions
 
+def check_parameter_name(parameter, value, properties):
+    """Checks if a parameter name is valid, raises an error if this is not the
+    case.
+
+    Arguments:
+    - `parameter`: the parameter name.
+    - `value`: the value of the parameter.
+    - `properties`: the properties array of valid fields.
+    """
+
+    if parameter not in properties:
+        raise_invalid_parameter(parameter)
+
+    if value == "":
+        raise_invalid_parameter_value(parameter, "")
+
+    if parameter == 'id' or parameter == 'year':
+        try:
+            int(value)
+        except:
+            raise_invalid_parameter_value(parameter, value)
+
+    if parameter == 'longitude' or parameter == 'latitude':
+        try:
+            float(value)
+        except:
+            raise_invalid_parameter_value(parameter, value)
+
+
+def check_paging_value(parameter, value):
+    """Check that a paging value is an integer.
+
+    Arguments:
+    - `parameter`: the paging parameter name.
+    - `value`: the value of the parameter.
+    """
+
+    try:
+        int(value)
+    except:
+        raise_invalid_parameter_value(parameter, value)
+
+
+def check_field(parameter, field, properties):
+    """Check that a field exists.
+
+    Arguments:
+    - `parameter`: the field name.
+    - `field`: the field value.
+    - `properties`: the properties array of valid fields.
+    """
+
+    if field not in properties:
+        raise_invalid_parameter_value(parameter, field)
+
 
 def raise_invalid_parameter(parameter):
     """Raises an error when an invalid parameter is passed in the query string.
 
     Arguments:
-    - `parameter`:
+    - `parameter`: the invalid parameter passed in the query string.
     """
+
     url = request.url
     api_index = url.index('/api/')
     url_suffix = urllib2.unquote(request.url[api_index:])
@@ -223,65 +276,15 @@ def raise_invalid_parameter(parameter):
                             'rel': 'self'}]})
 
 
-def check_paging_value(parameter, value):
-    """Check that a paging value is an integer.
-
-    Arguments:
-    - `value`:
-    """
-    try:
-        int(value)
-    except:
-        raise_invalid_parameter_value(parameter, value)
-
-
-def check_field(field, properties):
-    """Check that a field exists.
-
-    Arguments:
-    - `field`:
-    - `properties`:
-    """
-    if field not in properties:
-        raise_invalid_parameter_value('sort', field)
-
-
-def check_parameter_name(parameter, value, properties):
-    """Checks if a parameter name is valid, raises an error if this is not the
-    case.
-
-    Arguments:
-    - `parameter`:
-    - `value`:
-    - `properties`:
-    """
-    if parameter not in properties:
-        raise_invalid_parameter(parameter)
-
-    if value == "":
-        raise_invalid_parameter_value(parameter, "")
-
-    if (parameter == 'id' or parameter == 'year'):
-        try:
-            int(value)
-        except:
-            raise_invalid_parameter_value(parameter, value)
-
-    if (parameter == 'longitude' or parameter == 'latitude'):
-        try:
-            float(value)
-        except:
-            raise_invalid_parameter_value(parameter, value)
-
-
 def raise_invalid_parameter_value(parameter, value):
     """Raises an error when an invalid parameter value is passed in the query
     string.
 
     Arguments:
-    - `parameter`:
-    - `value`:
+    - `parameter`: the parameter name.
+    - `value`: the value of the parameter.
     """
+
     url = request.url
     api_index = url.index('/api/')
     url_suffix = urllib2.unquote(request.url[api_index:])
@@ -297,7 +300,10 @@ def raise_invalid_parameter_value(parameter, value):
 def jsonify_movie_location(movie_location):
     """Takes a MovieLocation object and returns its JSON representation.
 
+    Arguments:
+    - `movie_location`: The MovieLocation object to jsonify.
     """
+
     fields = ['id', 'title', 'year', 'location', 'fun_fact',
               'production_company', 'distributor', 'director', 'writer',
               'actor_1', 'actor_2', 'actor_3', 'latitude', 'longitude',

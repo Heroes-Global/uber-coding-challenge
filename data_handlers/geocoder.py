@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Quick and dirty script for augmenting a list of movie locations with their
-# respective coordinates (latitude, longitude).
+# respective coordinates (latitude, longitude) using Google's geocoding API.
 
 # # Imports
 

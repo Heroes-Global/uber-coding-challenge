@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-# Quick and dirty script for importing all movie locations into app database.
+# Quick and dirty script for importing all movie locations into the app
+# database.
 
 # # Imports
 

@@ -4,7 +4,6 @@
 
 import os
 import unittest
-from nose.tools import *
 
 from app import models
 

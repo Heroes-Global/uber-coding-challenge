@@ -6,7 +6,6 @@ import os
 import unittest
 import urllib2
 import json
-from nose.tools import *
 
 from config import BASE_DIR
 from app import app
@@ -189,7 +188,7 @@ class APITestCase(unittest.TestCase):
             self.baseUrl + "v1/movies?year<=1954"))
         assert jsonResponse['movies'][12]['year'] == 1938
 
-    # error
+    # errors
 
     def test_v1_movie_year_eq_horse_should_give_error(self):
         try:
@@ -218,6 +217,8 @@ class APITestCase(unittest.TestCase):
         jsonResponse = json.load(urllib2.urlopen(
             self.baseUrl + "v1/movies?longitude=-122.408092"))
         assert jsonResponse['movies'][0]['director'] == "Norman Foster"
+
+    # errors
 
     def test_v1_latitude_eq_horse_should_raise_error(self):
         try:
@@ -259,6 +260,8 @@ class APITestCase(unittest.TestCase):
             self.baseUrl + "v1/movies?sort=-title"))
         assert jsonResponse['movies'][0]['title'] == "Zodiac"
 
+    # errors
+
     def test_v1_movies_sort_by_bar_asc_should_raise_error(self):
         try:
             urllib2.urlopen(self.baseUrl + "v1/movies?sort=bar")
@@ -289,6 +292,11 @@ class APITestCase(unittest.TestCase):
 
     # GET /movies?fields
 
+    def test_v1_movies_actor_1_should_charles_chaplin(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?fields=actor_1,year,title"))
+        assert jsonResponse['movies'][0]['actor_1'] == "Charles Chaplin"
+
     def test_v1_movies_writer_should_have_been_removed(self):
         jsonResponse = json.load(urllib2.urlopen(
             self.baseUrl + "v1/movies?fields=title,year,director"))
@@ -298,6 +306,8 @@ class APITestCase(unittest.TestCase):
         except KeyError as e:
             assert True
 
+    # errors
+
     def test_v1_movies_wrong_field_should_raise_error(self):
         try:
             urllib2.urlopen(self.baseUrl + "v1/movies?fields=title,baz")
@@ -305,11 +315,6 @@ class APITestCase(unittest.TestCase):
         except Exception as e:
             response = json.loads(e.read())
             assert response['error']['status_code'] == 400
-
-    def test_v1_movies_actor_1_should_charles_chaplin(self):
-        jsonResponse = json.load(urllib2.urlopen(
-            self.baseUrl + "v1/movies?fields=actor_1,year,title"))
-        assert jsonResponse['movies'][0]['actor_1'] == "Charles Chaplin"
 
     # GET /movies?sort&fields
 
@@ -333,6 +338,13 @@ class APITestCase(unittest.TestCase):
             self.baseUrl + "v1/movies?limit=15"))
         assert len(jsonResponse['movies']) == 15
 
+    def test_v1_movies_offset_actor_2_should_be_jeanette_macdonald(self):
+        jsonResponse = json.load(urllib2.urlopen(
+            self.baseUrl + "v1/movies?offset=8"))
+        assert jsonResponse['movies'][0]['actor_2'] == "Jeanette MacDonald"
+
+    # errors
+
     def test_v1_movies_limit_invalid_value_should_raise_error(self):
         try:
             urllib2.urlopen(self.baseUrl + "v1/movies?limit=foobar")
@@ -340,11 +352,6 @@ class APITestCase(unittest.TestCase):
         except Exception as e:
             response = json.loads(e.read())
             assert response['error']['status_code'] == 400
-
-    def test_v1_movies_offset_actor_2_should_be_jeanette_macdonald(self):
-        jsonResponse = json.load(urllib2.urlopen(
-            self.baseUrl + "v1/movies?offset=8"))
-        assert jsonResponse['movies'][0]['actor_2'] == "Jeanette MacDonald"
 
     def test_v1_movies_offset_invalid_value_should_raise_error(self):
         try:

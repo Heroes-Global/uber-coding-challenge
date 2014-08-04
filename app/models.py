@@ -10,7 +10,7 @@ import unicodedata
 
 
 class MovieLocation(db.Model):
-    """Encapsulates movie location."""
+    """Encapsulates a movie location."""
 
     # ## Fields
 

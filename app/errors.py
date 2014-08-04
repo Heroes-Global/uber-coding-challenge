@@ -16,9 +16,9 @@ class InvalidUsage(Exception):
         """Initializes an InvalidUsage exception.
 
         Arguments:
-        - `message`:
-        - `status_code`:
-        - `payload`:
+        - `message`: the error message.
+        - `status_code`: the status code.
+        - `payload`: an optional payload of the error object.
         """
 
         Exception.__init__(self)
@@ -28,7 +28,7 @@ class InvalidUsage(Exception):
         self.payload = payload
 
     def to_dict(self):
-        """Return a dictionary representation of the error."""
+        """Returns a dictionary representation of the error."""
 
         d = {'error': {}}
         d['error'] = self.payload or {}
