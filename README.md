@@ -95,4 +95,6 @@ which would also be the next issues to address if given more time.
   a movie location object, e.g., 'writer, 'director' and 'actor_1'.
 - Used the Google Maps API 3 to show the map and add the markers for every movie
   location.
-- The JavaScript code checked with the JSHint tool.
+- Used Google's Geocoding API to add latitude and longitude values for all movie
+  locations.
+- The JavaScript code has been checked with the JSHint tool.
