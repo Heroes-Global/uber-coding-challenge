@@ -2,7 +2,7 @@
 
 # ## Imports
 
-from flask import url_for, abort, jsonify, request
+from flask import url_for, abort, jsonify, request, render_template
 from flask.ext.cors import cross_origin
 from app import app
 from app import models
@@ -87,6 +87,15 @@ def add_header(response):
 
     response.cache_control.max_age = CLIENT_CACHE_TIMEOUT
     return response
+
+
+# ## Documentation page
+
+@app.route('/sfmovies/api/v1/', methods=['GET'])
+@app.route('/sfmovies/api/v1/docs', methods=['GET'])
+def get_documentation():
+    """Returns a documentation page of the API."""
+    return render_template("docs.html")
 
 # ## Resources
 

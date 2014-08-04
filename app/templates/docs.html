@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SF Movies: API Documentation</title>
+  </head>
+  <style>
+    table,th,td
+    {
+    border:1px solid black;
+    border-collapse:collapse
+    }
+  </style>
+  <body>
+    <h1>SF Movies: API Documentation</h1>
+    This API exposes one resource which can only be called with GET:
+    <table border="1", style="width:600px">
+      <tr><td><b>Resource</b></td><td><b>GET</b></td></tr>
+      <tr><td><code>/sfmovies/api/v1/movies</code></td><td>Returns a list of
+      movie locations represented as JSON objects.</td></tr>
+      <tr><td><code>/sfmovies/api/v1/movies/[ID]</code></td><td>Returns the
+      movie location with the specified [ID].</td></tr>
+    </table>
+    A movie location object has the following fields:<br/>
+    <code>id, title, year, location, fun_fact, director, writer,
+    distributor,</code><br/> <code>production_company, actor_1, actor_2,
+    actor_3, longitude, latitude, links</code>.<br/>
+    <br/>
+    Furthermore, the resource <code>/sfmovies/api/v1/movies</code> takes the
+    following optional parameters:
+    <table border="1", style="width:1000px">
+      <tr><td><b>Parameter</b></td><td><b>Description</b></td><td><b>Example</b></tr>
+      <tr><td>Filtering:</td><td width="40%">Filters the result on a specific field,
+      returning all movie locations meeting the
+      requirement.</td><td><code>/sfmovies/api/v1/movies?year>=1958</code><br/><code>/sfmovies/api/v1/movies?title==The+Rock</code></td></tr>
+      <tr><td>Sorting:</td><td width="40%">Sorts the result based on the
+      specified field and its
+      order.</td><td><code>/sfmovies/api/v1/movies?sort=-year</code><br/><code>/sfmovies/api/v1/movies?sort=director</code></td></tr>
+      <tr><td>Field selection:</td><td>Selects the fields to be returned for
+      each movie location
+      object.</td><td><code>/sfmovies/api/v1/movies?fields=title,year,actor_1</code><br/><code>/sfmovies/api/v1/movies?fields=location,latitude,longitude</code></td></tr>
+      <tr><td>Pagination:</td><td>Limits the number of results and their
+      offset.</td><td><code>/sfmovies/api/v1/movies?limit=20</code><br/><code>/sfmovies/api/v1/movies?offset=5</code></td></tr>
+    </table>
+    Each of which can be combined to form more complex queries like:<br/>
+    <code>/sfmovies/api/v1/movies?director=Woody+Allen&fields=title,year,actor_1&sort=-year</code><br/>
+    which returns all locations for movies directed by Woody Allen sorted by
+    year (descending) and where only the title, year and actor fields are
+    included.
+  </body>
+</html>
